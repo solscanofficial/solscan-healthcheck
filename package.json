@@ -1,0 +1,29 @@
+{
+  "name": "solscan-healthcheck",
+  "version": "1.0.0",
+  "description": "healthcheck scripts for solscan.io",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/solscanofficial/solscan-healthcheck.git"
+  },
+  "keywords": [
+    "solscan",
+    "healthcheck"
+  ],
+  "author": "NguyenNguyen (nguyenbk92@gmail.com)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/solscanofficial/solscan-healthcheck/issues"
+  },
+  "homepage": "https://github.com/solscanofficial/solscan-healthcheck#readme",
+  "dependencies": {
+    "axios": "^0.26.0",
+    "date-fns": "^2.28.0",
+    "dotenv": "^16.0.0",
+    "noti_bot": "^1.1.2"
+  }
+}
