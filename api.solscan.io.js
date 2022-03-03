@@ -1,11 +1,11 @@
-const axios = require("axios").default;
-const { formatDistance } = require("date-fns");
+const axios = require("axios").default
+const { formatDistance } = require("date-fns")
 
 // **********************
 // PLEASE VERIFY CHECK_LIST
 // **********************
 
-const {OK, ERROR} = require('./status')
+const { OK, ERROR } = require('./status')
 
 const SAMPLE_ADDRESS = `2qzTURMGo9gVdwYyCbyiTrvyDCvLNDaRPkiWefdnmExb`
 const SAMPLE_TOKEN = `SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt`
@@ -13,15 +13,15 @@ const SAMPLE_TOKEN = `SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt`
 
 const blockCheck = async (solscanEndpoint, timeThreshold) => {
   try {
-    const { data } = await axios.get(`${solscanEndpoint}/block/last?q=20`);
+    const { data } = await axios.get(`${solscanEndpoint}/block/last?q=1`)
     if (!data || !data[0]) {
       return {
         status: ERROR,
         error: `Solscan Block API is down`,
-      };
+      }
     }
-    let latestBlock = data[0];
-    let now = Date.now() / 1000;
+    let latestBlock = data[0]
+    let now = Date.now() / 1000
     if (now - latestBlock.result.blockTime > timeThreshold) {
       return {
         status: ERROR,
@@ -34,33 +34,33 @@ const blockCheck = async (solscanEndpoint, timeThreshold) => {
         )} (${new Date(latestBlock.result.blockTime * 1000).toLocaleTimeString(
           "en-US"
         )}). LatestBlock: ${latestBlock.result.blockHeight}`,
-      };
+      }
     }
   } catch (err) {
     return {
       status: ERROR,
       error: `Solscan Block API is down ${err}`,
-    };
+    }
   }
 
   return {
     status: OK,
-  };
-};
+  }
+}
 
 const transactionCheck = async (solscanEndpoint, timeThreshold) => {
   try {
     const { data } = await axios.get(
-      `${solscanEndpoint}/transaction/last?q=20`
-    );
+      `${solscanEndpoint}/transaction/last?q=1`
+    )
     if (!data || !data[0]) {
       return {
         status: ERROR,
         error: `Solscan Transaction API is down`,
-      };
+      }
     }
-    let latestTx = data[0];
-    let now = Date.now() / 1000;
+    let latestTx = data[0]
+    let now = Date.now() / 1000
     if (now - latestTx.blockTime > timeThreshold) {
       return {
         status: ERROR,
@@ -73,311 +73,324 @@ const transactionCheck = async (solscanEndpoint, timeThreshold) => {
         )} (${new Date(latestTx.blockTime * 1000).toLocaleTimeString(
           "en-US"
         )}) `,
-      };
+      }
     }
+
+    // check transaction detail API
+    const { data: txDetail } = await axios.get(
+      `${solscanEndpoint}/transaction?tx=${latestTx.txHash}`
+    )
+    if (!txDetail || txDetail.txHash != latestTx.txHash) {
+      return {
+        status: ERROR,
+        error: `Solscan TransactionDetail API is down ${err}`,
+      }
+    }
+
+
   } catch (err) {
     return {
       status: ERROR,
       error: `Solscan Transaction API is down ${err}`,
-    };
+    }
   }
 
   try {
     const { data } = await axios.get(
       `${solscanEndpoint}/account/transaction?address=${SAMPLE_ADDRESS}`
-    );
-    if (!data || !data.data || ! data.data[0]) {
+    )
+    if (!data || !data.data || !data.data[0]) {
       return {
         status: ERROR,
         error: `Failed to get transactions of account ${SAMPLE_ADDRESS}`,
-      };
+      }
     }
-    
+
   } catch (err) {
     return {
       status: ERROR,
       error: `Failed to get transactions of account ${SAMPLE_ADDRESS} ${err}`,
-    };
+    }
   }
 
   return {
     status: OK,
-  };
-};
+  }
+}
 
 const splTransferCheck = async (solscanEndpoint, timeThreshold) => {
-    try {
-        const { data } = await axios.get(
-          `${solscanEndpoint}/account/token/txs?address=${SAMPLE_ADDRESS}`
-        );
-        if (!data || !data.data) {
-          return {
-            status: ERROR,
-            error: `Failed to get SplTransfer of account ${SAMPLE_ADDRESS}`,
-          };
-        }
-        
-      } catch (err) {
-        return {
-          status: ERROR,
-          error: `Failed to get SplTransfer of account ${SAMPLE_ADDRESS} ${err}`,
-        };
+  try {
+    const { data } = await axios.get(
+      `${solscanEndpoint}/account/token/txs?address=${SAMPLE_ADDRESS}`
+    )
+    if (!data || !data.data) {
+      return {
+        status: ERROR,
+        error: `Failed to get SplTransfer of account ${SAMPLE_ADDRESS}`,
       }
+    }
+
+  } catch (err) {
+    return {
+      status: ERROR,
+      error: `Failed to get SplTransfer of account ${SAMPLE_ADDRESS} ${err}`,
+    }
+  }
 
   return {
     status: OK,
-  };
-};
+  }
+}
 
 const solTransferCheck = async (solscanEndpoint, timeThreshold) => {
-    try {
-        const { data } = await axios.get(
-          `${solscanEndpoint}/account/soltransfer/txs?address=${SAMPLE_ADDRESS}`
-        );
-        if (!data || !data.data) {
-          return {
-            status: ERROR,
-            error: `Failed to get SolTransfer of account ${SAMPLE_ADDRESS}`,
-          };
-        }
-        
-      } catch (err) {
-        return {
-          status: ERROR,
-          error: `Failed to get SolTransfer of account ${SAMPLE_ADDRESS} ${err}`,
-        };
+  try {
+    const { data } = await axios.get(
+      `${solscanEndpoint}/account/soltransfer/txs?address=${SAMPLE_ADDRESS}`
+    )
+    if (!data || !data.data) {
+      return {
+        status: ERROR,
+        error: `Failed to get SolTransfer of account ${SAMPLE_ADDRESS}`,
       }
+    }
+
+  } catch (err) {
+    return {
+      status: ERROR,
+      error: `Failed to get SolTransfer of account ${SAMPLE_ADDRESS} ${err}`,
+    }
+  }
 
   return {
     status: OK,
-  };
-};
+  }
+}
 
 
 
 const accountCheck = async (solscanEndpoint, timeThreshold) => {
-    try {
-      const { data } = await axios.get(
-        `${solscanEndpoint}/account?address=${SAMPLE_ADDRESS}`
-      );
-      if (!data || !data.data || ! data.data.type) {
-        return {
-          status: ERROR,
-          error: `Failed to get AccountData of account ${SAMPLE_ADDRESS}`,
-        };
-      }
-      
-    } catch (err) {
+  try {
+    const { data } = await axios.get(
+      `${solscanEndpoint}/account?address=${SAMPLE_ADDRESS}`
+    )
+    if (!data || !data.data || !data.data.type) {
       return {
         status: ERROR,
-        error: `Failed to get AccountData of account ${SAMPLE_ADDRESS} ${err}`,
-      };
+        error: `Failed to get AccountData of account ${SAMPLE_ADDRESS}`,
+      }
     }
-  
+
+  } catch (err) {
     return {
-      status: OK,
-    };
-  };
+      status: ERROR,
+      error: `Failed to get AccountData of account ${SAMPLE_ADDRESS} ${err}`,
+    }
+  }
+
+  return {
+    status: OK,
+  }
+}
 
 
-  const tokenCheck = async (solscanEndpoint, timeThreshold) => {
+const tokenCheck = async (solscanEndpoint, timeThreshold) => {
 
-    try {
-        const { data } = await axios.get(
-          `${solscanEndpoint}/tokens?offset=0&limit=5&sortby=market_cap&sorttype=desc`
-        );
-        if (!data || !data.data || !data.data.tokens || !data.data.tokens[0] || !data.data.tokens[0].mintAddress) {
-          return {
-            status: ERROR,
-            error: `Failed to get TokenList`,
-          };
-        }
-        
-      } catch (err) {
-        return {
-          status: ERROR,
-          error: `Failed to get TokenList ${err}`,
-        };
+  try {
+    const { data } = await axios.get(
+      `${solscanEndpoint}/tokens?offset=0&limit=5&sortby=market_cap&sorttype=desc`
+    )
+    if (!data || !data.data || !data.data.tokens || !data.data.tokens[0] || !data.data.tokens[0].mintAddress) {
+      return {
+        status: ERROR,
+        error: `Failed to get TokenList`,
       }
-  
-      try {
-        const { data } = await axios.get(
-          `${solscanEndpoint}/token/meta?token=SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt`
-        );
-        if (!data || !data.data || !data.data.symbol) {
-          return {
-            status: ERROR,
-            error: `Failed to get TokenDetail of ${SAMPLE_TOKEN}`,
-          };
-        }
-        
-      } catch (err) {
-        return {
-          status: ERROR,
-          error: `Failed to get TokenDetail of ${SAMPLE_TOKEN} ${err}`,
-        };
-      }
-      try {
-        const { data } = await axios.get(
-          `${solscanEndpoint}/token/holders?token=${SAMPLE_TOKEN}&offset=0&size=5`
-        );
-        if (!data || !data.data || !data.data.total || !data.data.result  || !data.data.result[0]  || !data.data.result[0].address) {
-          return {
-            status: ERROR,
-            error: `Failed to get Token Holder of ${SAMPLE_TOKEN}`,
-          };
-        }
-        
-      } catch (err) {
-        return {
-          status: ERROR,
-          error: `Failed to get Token Holder of ${SAMPLE_TOKEN} ${err}`,
-        };
-      }
-      
+    }
+
+  } catch (err) {
     return {
-      status: OK,
-    };
-  };
+      status: ERROR,
+      error: `Failed to get TokenList ${err}`,
+    }
+  }
 
-
-
-  const defiCheck = async (solscanEndpoint, timeThreshold) => {
-
-    try {
-        const { data } = await axios.get(
-          `${solscanEndpoint}/amm/all`
-        );
-        if (!data || !data.data || !data.data[0] || !data.data[0].address) {
-          return {
-            status: ERROR,
-            error: `SolscanAPI: failed to get all AMMs`,
-          };
-        }
-        
-      } catch (err) {
-        return {
-          status: ERROR,
-          error: `SolscanAPI: failed to get all AMMs ${err}`,
-        };
+  try {
+    const { data } = await axios.get(
+      `${solscanEndpoint}/token/meta?token=${SAMPLE_TOKEN}`
+    )
+    if (!data || !data.data || !data.data.symbol) {
+      return {
+        status: ERROR,
+        error: `Failed to get TokenMetadata of ${SAMPLE_TOKEN}`,
       }
-      try {
-        const { data } = await axios.get(
-          `${solscanEndpoint}/amm/reads?source=raydium&keyword=sol&offset=0&limit=1`
-        );
-        if (!data || !data.data || !data.data.items || !data.data.items[0] || !data.data.items[0].address) {
-          return {
-            status: ERROR,
-            error: `SolscanAPI: failed to get AMM detail`,
-          };
-        }
-        
-      } catch (err) {
-        return {
-          status: ERROR,
-          error: `SolscanAPI: failed to get AMM detail ${err}`,
-        };
-      }
-  
+    }
 
-      
+  } catch (err) {
     return {
-      status: OK,
-    };
-  };
-
-  
-
-  const nftCheck = async (solscanEndpoint, timeThreshold) => {
-    let latestTrade
-    let newNFT
-
-    try {
-        const { data } = await axios.get(
-          `${solscanEndpoint}/nft/market/trade?offset=0&limit=1`
-        );
-        if (!data || !data.data || !data.data[0] || !data.data[0].tradeTime) {
-          return {
-            status: ERROR,
-            error: `SolscanAPI: failed to get NFT trades`,
-          };
-        }
-        latestTrade = !data.data[0]
-        
-      } catch (err) {
-        return {
-          status: ERROR,
-          error: `SolscanAPI: failed to get NFT trades ${err}`,
-        };
+      status: ERROR,
+      error: `Failed to get TokenMetadata of ${SAMPLE_TOKEN} ${err}`,
+    }
+  }
+  try {
+    const { data } = await axios.get(
+      `${solscanEndpoint}/token/holders?token=${SAMPLE_TOKEN}&offset=0&size=5`
+    )
+    if (!data || !data.data || !data.data.total || !data.data.result || !data.data.result[0] || !data.data.result[0].address) {
+      return {
+        status: ERROR,
+        error: `Failed to get Token Holder of ${SAMPLE_TOKEN}`,
       }
-      let now = Date.now() / 1000;
-      if (now - latestTrade.tradeTime > timeThreshold) {
-        return {
-          status: ERROR,
-          error: `No new NFT trades since ${formatDistance(
-            latestTrade.tradeTime * 1000,
-            new Date(),
-            {
-              addSuffix: true,
-            }
-          )} (${new Date(latestTrade.tradeTime * 1000).toLocaleTimeString(
-            "en-US"
-          )}) `,
-        };
-      }
+    }
 
-      try {
-        const { data } = await axios.get(
-          `${solscanEndpoint}/collection?sortBy=volume`
-        );        
-      } catch (err) {
-        return {
-          status: ERROR,
-          error: `SolscanAPI: failed to get NFT collection ${err}`,
-        };
-      }
-      
-
-      try {
-        const { data } = await axios.get(
-          `${solscanEndpoint}/nft?sortBy=createdTime`
-        );
-        if (!data || !data.data || !data.data[0] || !data.data[0].info || !data.data[0].info.createdTime) {
-          return {
-            status: ERROR,
-            error: `SolscanAPI: failed to get new NFTs`,
-          };
-        }
-        newNFT = !data.data[0].info
-      } catch (err) {
-        return {
-          status: ERROR,
-          error: `SolscanAPI: failed to get new NFTs ${err}`,
-        };
-      }
-      
-      
-      if (now - newNFT.createdTime > timeThreshold) {
-        return {
-          status: ERROR,
-          error: `No new NFTs since ${formatDistance(
-            newNFT.createdTime * 1000,
-            new Date(),
-            {
-              addSuffix: true,
-            }
-          )} (${new Date(newNFT.createdTime * 1000).toLocaleTimeString(
-            "en-US"
-          )}) `,
-        };
-      }
-
+  } catch (err) {
     return {
-      status: OK,
-    };
-  };
+      status: ERROR,
+      error: `Failed to get Token Holder of ${SAMPLE_TOKEN} ${err}`,
+    }
+  }
 
-  
+  return {
+    status: OK,
+  }
+}
+
+
+
+const defiCheck = async (solscanEndpoint, timeThreshold) => {
+
+  try {
+    const { data } = await axios.get(
+      `${solscanEndpoint}/amm/all`
+    )
+    if (!data || !data.data || !data.data[0] || !data.data[0].address) {
+      return {
+        status: ERROR,
+        error: `SolscanAPI: failed to get all AMMs`,
+      }
+    }
+
+  } catch (err) {
+    return {
+      status: ERROR,
+      error: `SolscanAPI: failed to get all AMMs ${err}`,
+    }
+  }
+  try {
+    const { data } = await axios.get(
+      `${solscanEndpoint}/amm/reads?source=raydium&keyword=sol&offset=0&limit=1`
+    )
+    if (!data || !data.data || !data.data.items || !data.data.items[0] || !data.data.items[0].address) {
+      return {
+        status: ERROR,
+        error: `SolscanAPI: failed to get AMM detail`,
+      }
+    }
+
+  } catch (err) {
+    return {
+      status: ERROR,
+      error: `SolscanAPI: failed to get AMM detail ${err}`,
+    }
+  }
+
+
+
+  return {
+    status: OK,
+  }
+}
+
+
+
+const nftCheck = async (solscanEndpoint, timeThreshold) => {
+  let latestTrade
+  let newNFT
+
+  try {
+    const { data } = await axios.get(
+      `${solscanEndpoint}/nft/market/trade?offset=0&limit=1`
+    )
+    if (!data || !data.data || !data.data[0] || !data.data[0].tradeTime) {
+      return {
+        status: ERROR,
+        error: `SolscanAPI: failed to get NFT trades`,
+      }
+    }
+    latestTrade = !data.data[0]
+
+  } catch (err) {
+    return {
+      status: ERROR,
+      error: `SolscanAPI: failed to get NFT trades ${err}`,
+    }
+  }
+  let now = Date.now() / 1000
+  if (now - latestTrade.tradeTime > timeThreshold) {
+    return {
+      status: ERROR,
+      error: `No new NFT trades since ${formatDistance(
+        latestTrade.tradeTime * 1000,
+        new Date(),
+        {
+          addSuffix: true,
+        }
+      )} (${new Date(latestTrade.tradeTime * 1000).toLocaleTimeString(
+        "en-US"
+      )}) `,
+    }
+  }
+
+  try {
+    const { data } = await axios.get(
+      `${solscanEndpoint}/collection?sortBy=volume`
+    )
+  } catch (err) {
+    return {
+      status: ERROR,
+      error: `SolscanAPI: failed to get NFT collection ${err}`,
+    }
+  }
+
+
+  try {
+    const { data } = await axios.get(
+      `${solscanEndpoint}/nft?sortBy=createdTime`
+    )
+    if (!data || !data.data || !data.data[0] || !data.data[0].info || !data.data[0].info.createdTime) {
+      return {
+        status: ERROR,
+        error: `SolscanAPI: failed to get new NFTs`,
+      }
+    }
+    newNFT = !data.data[0].info
+  } catch (err) {
+    return {
+      status: ERROR,
+      error: `SolscanAPI: failed to get new NFTs ${err}`,
+    }
+  }
+
+
+  if (now - newNFT.createdTime > timeThreshold) {
+    return {
+      status: ERROR,
+      error: `No new NFTs since ${formatDistance(
+        newNFT.createdTime * 1000,
+        new Date(),
+        {
+          addSuffix: true,
+        }
+      )} (${new Date(newNFT.createdTime * 1000).toLocaleTimeString(
+        "en-US"
+      )}) `,
+    }
+  }
+
+  return {
+    status: OK,
+  }
+}
+
+
 
 const CHECK_LIST = {
   block: {
@@ -398,38 +411,38 @@ const CHECK_LIST = {
     healthCheckFunction: splTransferCheck,
   },
   account: {
-      healthCheckFunction: accountCheck
+    healthCheckFunction: accountCheck
   },
-  token : {
-      healthCheckFunction: tokenCheck
+  token: {
+    healthCheckFunction: tokenCheck
   },
   defi: {
-      healthCheckFunction: defiCheck,
+    healthCheckFunction: defiCheck,
   },
   nftCheck: {
-      healthCheckFunction: nftCheck,
-      timeThreshold: 30 * 60, // if no new block in 1800 seconds (30min), alert
+    healthCheckFunction: nftCheck,
+    timeThreshold: 30 * 60, // if no new block in 1800 seconds (30min), alert
   }
 
 
-};
+}
 
 const getHealthCheckData = async (solscanEndpoint = "https://api.solscan.io") => {
-  let data = [];
+  let data = []
   for (const module in CHECK_LIST) {
-    let checker = Object.assign({}, CHECK_LIST[module]);
+    let checker = Object.assign({}, CHECK_LIST[module])
     let res = await checker["healthCheckFunction"](
-    solscanEndpoint,
+      solscanEndpoint,
       checker["timeThreshold"]
-    );
+    )
     data.push({
       module: module,
       ...res,
-    });
+    })
   }
-  return data;
-};
+  return data
+}
 
 module.exports = {
   getHealthCheckData,
-};
+}
