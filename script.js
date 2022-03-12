@@ -32,7 +32,7 @@ const main = async () => {
     // PUBLIC API
     let publicApiData = await getPublicApiHealthCheckData()
     if (publicApiData && publicApiData.length) {
-        for (const e of data) {
+        for (const e of publicApiData) {
             if (e.status === ERROR) {
                 errors.push(e.error)
             }

@@ -134,7 +134,7 @@ const transactionCheck = async (solscanEndpoint, timeThreshold) => {
     const { data } = await axios.get(
       `${solscanEndpoint}/account/transactions?account=${SAMPLE_ADDRESS}&limit=1`
     )
-    if (!data || data[0] || !data[0].txHash) {
+    if (!data || !data[0] || !data[0].txHash) {
       return {
         status: ERROR,
         error: `${PREFIX} Failed to get transactions of account ${SAMPLE_ADDRESS}`,
@@ -236,7 +236,7 @@ const tokenCheck = async (solscanEndpoint, timeThreshold) => {
   // endpoint: /token/list
   try {
     const { data } = await axios.get(
-      `${solscanEndpoint}/token/list?offset=0&limit=5&sortby=market_cap&sorttype=desc`
+      `${solscanEndpoint}/token/list?offset=0&limit=5&sortBy=market_cap&direction=desc`
     )
     if (!data || !data.data || !data.data[0] || !data.data[0].mintAddress) {
       return {
@@ -254,7 +254,7 @@ const tokenCheck = async (solscanEndpoint, timeThreshold) => {
 
   try {
     const { data } = await axios.get(
-      `${solscanEndpoint}/token/meta?token=${SAMPLE_TOKEN}`
+      `${solscanEndpoint}/token/meta?tokenAddress=${SAMPLE_TOKEN}`
     )
     if (!data  || !data.symbol) {
       return {
