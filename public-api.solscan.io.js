@@ -160,7 +160,7 @@ const splTransferCheck = async (solscanEndpoint, timeThreshold) => {
     const { data } = await axios.get(
       `${solscanEndpoint}/account/splTransfers?account=${SAMPLE_ADDRESS}&limit=1`
     )
-    if (!data || !data.data || !data.data.tokenAddress) {
+    if (!data || !data.data || !data.data[0] || !data.data[0].tokenAddress) {
       return {
         status: ERROR,
         error: `${PREFIX} Failed to get SplTransfer of account ${SAMPLE_ADDRESS}`,
@@ -185,7 +185,7 @@ const solTransferCheck = async (solscanEndpoint, timeThreshold) => {
     const { data } = await axios.get(
       `${solscanEndpoint}/account/solTransfers?account=${SAMPLE_ADDRESS}&limit=1`
     )
-    if (!data || !data.data || !data.data.txHash) {
+    if (!data || !data.data || !data.data[0] || !data.data[0].txHash) {
       return {
         status: ERROR,
         error: `${PREFIX} Failed to get SolTransfer of account ${SAMPLE_ADDRESS}`,
@@ -273,7 +273,7 @@ const tokenCheck = async (solscanEndpoint, timeThreshold) => {
     const { data } = await axios.get(
       `${solscanEndpoint}/token/holders?tokenAddress=${SAMPLE_TOKEN}&offset=0&size=5`
     )
-    if (!data || !data[0] || !data[0].total || !data[0].data || !data[0].data.address) {
+    if (!data  || !data.total || !data.data[0] || !data.data[0].address) {
       return {
         status: ERROR,
         error: `${PREFIX} Failed to get Token Holder of ${SAMPLE_TOKEN}`,
