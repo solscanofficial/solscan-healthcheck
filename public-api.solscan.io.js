@@ -22,7 +22,7 @@ const blockCheck = async (solscanEndpoint, timeThreshold) => {
     if (!data || !data[0]) {
       return {
         status: ERROR,
-        error: `${PREFIX} Latest Block API is down`,
+        error: `${PREFIX} Latest Block API is down. Response data ${JSON.stringify(data)}`,
       }
     }
     let latestBlock = data[0]
@@ -60,7 +60,7 @@ const blockCheck = async (solscanEndpoint, timeThreshold) => {
     if (!data || !data.currentSlot || !data.result) {
       return {
         status: ERROR,
-        error: `${PREFIX} BlockDetail API is down`,
+        error: `${PREFIX} BlockDetail API is down. Response data ${JSON.stringify(data)}`,
       }
     }
   }
@@ -82,7 +82,7 @@ const transactionCheck = async (solscanEndpoint, timeThreshold) => {
     if (!data || !data[0]) {
       return {
         status: ERROR,
-        error: `${PREFIX} TransactionLast API is down`,
+        error: `${PREFIX} TransactionLast API is down. Response data ${JSON.stringify(data)}`,
       }
     }
     let latestTx = data[0]
@@ -111,7 +111,7 @@ const transactionCheck = async (solscanEndpoint, timeThreshold) => {
     if (!txDetail || txDetail.txHash != latestTx.transaction.signatures[0]) {
       return {
         status: ERROR,
-        error: `${PREFIX} TransactionDetail API is down ${err}`,
+        error: `${PREFIX} TransactionDetail API is down. Response data ${JSON.stringify(txDetail)}`,
       }      
     }
 
@@ -131,7 +131,7 @@ const transactionCheck = async (solscanEndpoint, timeThreshold) => {
     if (!data || !data[0] || !data[0].txHash) {
       return {
         status: ERROR,
-        error: `${PREFIX} Failed to get transactions of account ${SAMPLE_ADDRESS}`,
+        error: `${PREFIX} Failed to get transactions of account ${SAMPLE_ADDRESS}. Response data ${JSON.stringify(data)}`,
       }
     }
 
@@ -157,7 +157,7 @@ const splTransferCheck = async (solscanEndpoint, timeThreshold) => {
     if (!data || !data.data || !data.data[0] || !data.data[0].tokenAddress) {
       return {
         status: ERROR,
-        error: `${PREFIX} Failed to get SplTransfer of account ${SAMPLE_ADDRESS}`,
+        error: `${PREFIX} Failed to get SplTransfer of account ${SAMPLE_ADDRESS}. Response data ${JSON.stringify(data)}`,
       }
     }
 
@@ -182,7 +182,7 @@ const solTransferCheck = async (solscanEndpoint, timeThreshold) => {
     if (!data || !data.data || !data.data[0] || !data.data[0].txHash) {
       return {
         status: ERROR,
-        error: `${PREFIX} Failed to get SolTransfer of account ${SAMPLE_ADDRESS}`,
+        error: `${PREFIX} Failed to get SolTransfer of account ${SAMPLE_ADDRESS}. Response data ${JSON.stringify(data)}`,
       }
     }
 
@@ -208,7 +208,7 @@ const accountCheck = async (solscanEndpoint, timeThreshold) => {
     if (!data || !data.type || data.account != SAMPLE_ADDRESS) {
       return {
         status: ERROR,
-        error: `${PREFIX} Failed to get AccountData of account ${SAMPLE_ADDRESS}`,
+        error: `${PREFIX} Failed to get AccountData of account ${SAMPLE_ADDRESS}. Response data ${JSON.stringify(data)}`,
       }
     }
 
@@ -235,7 +235,7 @@ const tokenCheck = async (solscanEndpoint, timeThreshold) => {
     if (!data || !data.data || !data.data[0] || !data.data[0].mintAddress) {
       return {
         status: ERROR,
-        error: `${PREFIX} Failed to get TokenList`,
+        error: `${PREFIX} Failed to get TokenList. Response data ${JSON.stringify(data)}`,
       }
     }
 
@@ -253,7 +253,7 @@ const tokenCheck = async (solscanEndpoint, timeThreshold) => {
     if (!data  || !data.symbol) {
       return {
         status: ERROR,
-        error: `${PREFIX} Failed to get TokenMetadata of ${SAMPLE_TOKEN}`,
+        error: `${PREFIX} Failed to get TokenMetadata of ${SAMPLE_TOKEN}. Response data ${JSON.stringify(data)}`,
       }
     }
 
@@ -270,7 +270,7 @@ const tokenCheck = async (solscanEndpoint, timeThreshold) => {
     if (!data  || !data.total || !data.data[0] || !data.data[0].address) {
       return {
         status: ERROR,
-        error: `${PREFIX} Failed to get Token Holder of ${SAMPLE_TOKEN}`,
+        error: `${PREFIX} Failed to get Token Holder of ${SAMPLE_TOKEN}. Response data ${JSON.stringify(data)}`,
       }
     }
 
