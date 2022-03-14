@@ -52,12 +52,6 @@ const blockCheck = async (solscanEndpoint, timeThreshold) => {
 // endpoint: /block/transaction
   if (latestBlockNumber) {
     const { data } = await axios.get(`${solscanEndpoint}/block/transactions?block=${latestBlockNumber}`)
-    if (!data || !data[0] || !data[0].transaction) {
-      return {
-        status: ERROR,
-        error: `${PREFIX} BlockTransaction API is down`,
-      }
-    }
   }
 
   // endpoint: /block/${block}
