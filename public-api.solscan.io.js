@@ -79,12 +79,12 @@ const transactionCheck = async (solscanEndpoint, timeThreshold) => {
     const { data } = await axios.get(
       `${solscanEndpoint}/transaction/last?limit=1`
     )
-    if (!data || !data[0]) {
-      return {
-        status: ERROR,
-        error: `${PREFIX} TransactionLast API is down. Response data ${JSON.stringify(data)}`,
-      }
-    }
+//   if (!data || !data[0]) {
+//     return {
+//       status: ERROR,
+//       error: `${PREFIX} TransactionLast API is down. Response data ${JSON.stringify(data)}`,
+//     }
+//   }
     let latestTx = data[0]
     let now = Date.now() / 1000
     if (now - latestTx.blockTime > timeThreshold) {
