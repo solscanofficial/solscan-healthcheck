@@ -86,6 +86,11 @@ const transactionCheck = async (solscanEndpoint, timeThreshold) => {
 //     }
 //   }
     let latestTx = data[0]
+    if (!latestTx) {
+	 return {
+    		status: OK,
+  	}
+    }
     let now = Date.now() / 1000
     if (now - latestTx.blockTime > timeThreshold) {
       return {

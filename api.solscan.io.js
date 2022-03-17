@@ -83,7 +83,7 @@ const transactionCheck = async (solscanEndpoint, timeThreshold) => {
     if (!txDetail || txDetail.txHash != latestTx.txHash) {
       return {
         status: ERROR,
-        error: `Solscan TransactionDetail API is down ${err}`,
+        error: `Solscan TransactionDetail API is down. TxDetail is ${JSON.stringify(txDetail)}`,
       }
     }
 
