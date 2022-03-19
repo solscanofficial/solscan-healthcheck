@@ -86,7 +86,7 @@ const transactionCheck = async (solscanEndpoint, timeThreshold) => {
 //     }
 //   }
     let latestTx = data[0]
-    if (!latestTx) {
+    if (!latestTx || !latestTx.blockTime || !latestTx.transaction) {
 	 return {
     		status: OK,
   	}

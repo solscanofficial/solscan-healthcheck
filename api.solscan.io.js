@@ -264,7 +264,7 @@ const defiCheck = async (solscanEndpoint, timeThreshold) => {
     if (!data || !data.data || !data.data[0] || !data.data[0].address) {
       return {
         status: ERROR,
-        error: `SolscanAPI: failed to get all AMMs`,
+        error: `SolscanAPI: failed to get all AMMs. Response data ${JSON.stringify(data)}`,
       }
     }
 
@@ -281,7 +281,7 @@ const defiCheck = async (solscanEndpoint, timeThreshold) => {
     if (!data || !data.data || !data.data.items || !data.data.items[0] || !data.data.items[0].address) {
       return {
         status: ERROR,
-        error: `SolscanAPI: failed to get AMM detail`,
+        error: `SolscanAPI: failed to get AMM detail. Response data ${JSON.stringify(data)}`,
       }
     }
 
@@ -312,7 +312,7 @@ const nftCheck = async (solscanEndpoint, timeThreshold) => {
     if (!data || !data.data || !data.data[0] || !data.data[0].tradeTime) {
       return {
         status: ERROR,
-        error: `SolscanAPI: failed to get NFT trades`,
+        error: `SolscanAPI: failed to get NFT trades. Response data ${JSON.stringify(data)}`,
       }
     }
     latestTrade = !data.data[0]
