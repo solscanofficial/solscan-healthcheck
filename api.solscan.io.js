@@ -51,7 +51,7 @@ const blockCheck = async (solscanEndpoint, timeThreshold) => {
 
 const transactionCheck = async (solscanEndpoint, timeThreshold) => {
   try {
-    const { data } = await axios.get(`${solscanEndpoint}/transaction/last?q=1`);
+    const { data } = await axios.get(`${solscanEndpoint}/transaction/last?q=20`);
     if (!data || !data[0]) {
       return {
         status: ERROR,
@@ -60,7 +60,7 @@ const transactionCheck = async (solscanEndpoint, timeThreshold) => {
         )}`,
       };
     }
-    let latestTx = data[0];
+    let latestTx = data[19];
     let now = Date.now() / 1000;
     if (now - latestTx.blockTime > timeThreshold) {
       return {
@@ -100,7 +100,7 @@ const transactionCheck = async (solscanEndpoint, timeThreshold) => {
     const { data } = await axios.get(
       `${solscanEndpoint}/account/transaction?address=${SAMPLE_ADDRESS}`
     );
-    if (!data || !data.data || !data.data[0]) {
+    if (!data || !data.succcess) {
       return {
         status: ERROR,
         error: `Failed to get transactions of account ${SAMPLE_ADDRESS}. Response data is ${JSON.stringify(
