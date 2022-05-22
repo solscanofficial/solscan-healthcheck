@@ -360,6 +360,19 @@ const nftCheck = async (solscanEndpoint, timeThreshold) => {
     const { data } = await axios.get(
       `${solscanEndpoint}/collection?sortBy=volume`
     );
+	if (
+      !data ||
+      !data.data ||
+      !data.data[0]
+    ) {
+      return {
+        status: ERROR,
+        error: `SolscanAPI: failed to get NFT Collections ${JSON.stringify(
+          data
+        )}`,
+      };
+    }
+
   } catch (err) {
     return {
       status: ERROR,
@@ -403,6 +416,28 @@ const nftCheck = async (solscanEndpoint, timeThreshold) => {
           addSuffix: true,
         }
       )} (${new Date(newNFT.createdTime * 1000).toLocaleTimeString("en-US")}) `,
+    };
+  }
+   try {
+    const { data } = await axios.get(
+      `${solscanEndpoint}/nft?sortBy=tradeTime`
+    );
+    if (
+      !data ||
+      !data.data ||
+      !data.data[0]
+    ) {
+      return {
+        status: ERROR,
+        error: `SolscanAPI: failed to get all NFTs. Response data is ${JSON.stringify(
+          data
+        )}`,
+      };
+    }
+  } catch (err) {
+    return {
+      status: ERROR,
+      error: `SolscanAPI: failed to get all NFTs ${err}`,
     };
   }
 
