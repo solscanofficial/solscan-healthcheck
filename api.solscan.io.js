@@ -333,7 +333,7 @@ const nftCheck = async (solscanEndpoint, timeThreshold) => {
         )}`,
       };
     }
-    latestTrade = !data.data[0];
+    latestTrade = data.data[0];
   } catch (err) {
     return {
       status: ERROR,
@@ -344,7 +344,7 @@ const nftCheck = async (solscanEndpoint, timeThreshold) => {
   if (now - latestTrade.tradeTime > timeThreshold) {
     return {
       status: ERROR,
-      error: `No new NFT trades since ${formatDistance(
+      error: `No NFT trades since ${formatDistance(
         latestTrade.tradeTime * 1000,
         new Date(),
         {
@@ -398,14 +398,13 @@ const nftCheck = async (solscanEndpoint, timeThreshold) => {
         )}`,
       };
     }
-    newNFT = !data.data[0].info;
+    newNFT = data.data[0].info;
   } catch (err) {
     return {
       status: ERROR,
       error: `SolscanAPI: failed to get new NFTs ${err}`,
     };
   }
-
   if (now - newNFT.createdTime > timeThreshold) {
     return {
       status: ERROR,
