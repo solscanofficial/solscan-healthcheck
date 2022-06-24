@@ -279,7 +279,7 @@ const tokenCheck = async (solscanEndpoint, timeThreshold) => {
     const { data } = await axios.get(
       `${solscanEndpoint}/token/holders?tokenAddress=${SAMPLE_TOKEN}&offset=0&size=5`
     );
-    if (!data || !data.total || !data.data[0] || !data.data[0].address) {
+    if (!data) {
       return {
         status: ERROR,
         error: `${PREFIX} Failed to get Token Holder of ${SAMPLE_TOKEN}. Response data ${JSON.stringify(
