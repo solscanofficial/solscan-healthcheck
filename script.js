@@ -21,14 +21,14 @@ const main = async () => {
     let start = Date.now();
 
     // Backend
-    let data = await getHealthCheckData(process.env.SOLSCAN_ENDPOINT)
-    if (data && data.length) {
-        for (const e of data) {
-            if (e.status === ERROR) {
-                errors.push(...e.errors)
-            }
-        }
-    }
+    // let data = await getHealthCheckData(process.env.SOLSCAN_ENDPOINT)
+    // if (data && data.length) {
+    //     for (const e of data) {
+    //         if (e.status === ERROR) {
+    //             errors.push(...e.errors)
+    //         }
+    //     }
+    // }
 
     // PUBLIC API
     if (process.env.IS_CHECK_PUBLIC_API === 'true') {
