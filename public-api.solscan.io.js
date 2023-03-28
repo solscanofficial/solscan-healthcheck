@@ -18,8 +18,7 @@ const getData = async (url) => {
         "Content-Type": "application/json",
         "token": TOKEN
     }
-    const {data} = await axios.get(url, {headers: headers});
-    return data;
+    return await axios.get(url, {headers: headers});
 }
 
 const blockCheck = async (solscanEndpoint, timeThreshold) => {
@@ -28,7 +27,7 @@ const blockCheck = async (solscanEndpoint, timeThreshold) => {
 
     // endpoint: /block/last
     try {
-        const data = await getData(`${solscanEndpoint}/block/last?limit=1`);
+        const {data} = await getData(`${solscanEndpoint}/block/last?limit=1`);
         if (!data || !data[0]) {
             errors.push(`${PREFIX} Latest Block API is down. Response data ${JSON.stringify(data)}`);
         } else {
@@ -52,7 +51,7 @@ const blockCheck = async (solscanEndpoint, timeThreshold) => {
 
         // endpoint: /block/transaction
         if (latestBlockNumber) {
-            const data = await getData(
+            const {data} = await getData(
                 `${solscanEndpoint}/block/transactions?block=${latestBlockNumber}`
             );
             if (!data) {
@@ -64,7 +63,7 @@ const blockCheck = async (solscanEndpoint, timeThreshold) => {
 
         // endpoint: /block/${block}
         if (latestBlockNumber) {
-            const data = await getData(
+            const {data} = await getData(
                 `${solscanEndpoint}/block/${latestBlockNumber}`
             );
             if (!data || !data.currentSlot || !data.result) {
@@ -94,7 +93,7 @@ const transactionCheck = async (solscanEndpoint, timeThreshold) => {
 
     try {
         // endpoint: /transaction/last
-        const data = await getData(
+        const {data} = await getData(
             `${solscanEndpoint}/transaction/last?limit=1`
         );
         if (!data || !data[0]) {
@@ -112,7 +111,7 @@ const transactionCheck = async (solscanEndpoint, timeThreshold) => {
         }
 
         if (latestSig) {
-            const {data: txDetail} = await axios.get(
+            const {data: txDetail} = await getData(
                 `${solscanEndpoint}/transaction/${latestSig}`
             );
             if (!txDetail || txDetail.txHash !== latestSig) {
@@ -155,7 +154,7 @@ const splTransferCheck = async (solscanEndpoint, timeThreshold) => {
 
     // endpoint: /account/splTransfers
     try {
-        const data = await getData(
+        const {data} = await getData(
             `${solscanEndpoint}/account/splTransfers?account=${SAMPLE_ADDRESS}&limit=1`
         );
         if (!data || !data.data || !data.data[0] || !data.data[0].tokenAddress) {
@@ -184,7 +183,7 @@ const solTransferCheck = async (solscanEndpoint, timeThreshold) => {
 
     // endpoint: /account/solTransfers
     try {
-        const data = await getData(
+        const {data} = await getData(
             `${solscanEndpoint}/account/solTransfers?account=${SAMPLE_ADDRESS}&limit=1`
         );
         if (!data || !data.data || !data.data[0] || !data.data[0].txHash) {
@@ -214,7 +213,7 @@ const accountCheck = async (solscanEndpoint, timeThreshold) => {
 
     // endpoint: /account/tokens
     try {
-        const data = await getData(
+        const {data} = await getData(
             `${solscanEndpoint}/account/tokens?account=${SAMPLE_ADDRESS}`
         );
         if (!data || !data[0] || !data[0].tokenAddress) {
@@ -228,7 +227,7 @@ const accountCheck = async (solscanEndpoint, timeThreshold) => {
 
     // endpoint: /account/transactions
     try {
-        const data = await getData(
+        const {data} = await getData(
             `${solscanEndpoint}/account/transactions?account=${SAMPLE_ADDRESS}&limit=1`
         );
         if (!data || !data[0] || !data[0].txHash) {
@@ -242,7 +241,7 @@ const accountCheck = async (solscanEndpoint, timeThreshold) => {
 
     // endpoint: /account/stakeAccounts
     try {
-        const data = await getData(
+        const {data} = await getData(
             `${solscanEndpoint}/account/stakeAccounts?account=${SAMPLE_ADDRESS}`
         );
         if (!data) {
@@ -256,7 +255,7 @@ const accountCheck = async (solscanEndpoint, timeThreshold) => {
 
     // endpoint: /account/${account}
     try {
-        const data = await getData(
+        const {data} = await getData(
             `${solscanEndpoint}/account/${SAMPLE_ADDRESS}`
         );
         if (!data || !data.type || data.account !== SAMPLE_ADDRESS) {
@@ -285,7 +284,7 @@ const tokenCheck = async (solscanEndpoint, timeThreshold) => {
 
     // endpoint: /token/list
     try {
-        const data = await getData(
+        const {data} = await getData(
             `${solscanEndpoint}/token/list?offset=0&limit=5&sortBy=market_cap&direction=desc`
         );
         if (!data || !data.data || !data.data[0] || !data.data[0].mintAddress) {
@@ -299,7 +298,7 @@ const tokenCheck = async (solscanEndpoint, timeThreshold) => {
 
     // endpoint: /token/meta
     try {
-        const data = await getData(
+        const {data} = await getData(
             `${solscanEndpoint}/token/meta?tokenAddress=${SAMPLE_TOKEN}`
         );
         if (!data || !data.symbol) {
@@ -313,7 +312,7 @@ const tokenCheck = async (solscanEndpoint, timeThreshold) => {
 
     // endpoint: /token/holders
     try {
-        const data = await getData(
+        const {data} = await getData(
             `${solscanEndpoint}/token/holders?tokenAddress=${SAMPLE_TOKEN}&offset=0&size=5`
         );
         if (!data) {
@@ -342,7 +341,7 @@ const otherCheck = async (solscanEndpoint, timeThreshold) => {
 
     // endpoint: /market/token/
     try {
-        const data = await getData(
+        const {data} = await getData(
             `${solscanEndpoint}/market/token/${SAMPLE_TOKEN}`
         );
         if (!data) {
@@ -356,7 +355,7 @@ const otherCheck = async (solscanEndpoint, timeThreshold) => {
 
     // endpoint: /chaininfo/
     try {
-        const data = await getData(
+        const {data} = await getData(
             `${solscanEndpoint}/chaininfo/`
         );
         if (!data) {
