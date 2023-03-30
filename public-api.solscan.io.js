@@ -27,13 +27,19 @@ const blockCheck = async (solscanEndpoint, timeThreshold) => {
 
     // endpoint: /block/last
     try {
-        const {data} = await getData(`${solscanEndpoint}/block/last?limit=1`);
+        const {data} = await getData(`${solscanEndpoint}/block/last?limit=10`);
         if (!data || !data[0]) {
             errors.push(`${PREFIX} Latest Block API is down. Response data ${JSON.stringify(data)}`);
         } else {
             console.log(`${PREFIX} Get latest block success`);
 
             let latestBlock = data[0];
+            for (let block of data) {
+                if (block.result.blockhash) {
+                    latestBlock = block;
+                    break;
+                }
+            }
             latestBlockNumber = latestBlock.currentSlot;
             let now = Date.now() / 1000;
             if (now - latestBlock.result.blockTime > timeThreshold) {
