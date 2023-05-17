@@ -589,8 +589,7 @@ const nftCheck = async (solscanEndpoint, timeThreshold) => {
             !data.data ||
             !data.success ||
             !data.data[0] ||
-            !data.data[0].info ||
-            !data.data[0].info.createdTime
+            !data.data[0].info
         ) {
             errors.push(`[Solscan NFT API] Failed to get new NFTs. Response data is ${JSON.stringify(data)}`);
         } else {
