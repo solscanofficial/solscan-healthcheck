@@ -599,19 +599,6 @@ const nftCheck = async (solscanEndpoint, timeThreshold) => {
     } catch (err) {
         errors.push(`[Solscan NFT API] Failed to get new NFTs: ${err}`);
     }
-    if (newNFT) {
-        let now = Date.now() / 1000;
-        if (now - newNFT.createdTime > timeThreshold) {
-            errors.push(`[Solscan NFT API] No new NFTs since ${formatDistance(
-                newNFT.createdTime * 1000,
-                new Date(),
-                {
-                    addSuffix: true,
-                }
-            )} (${new Date(newNFT.createdTime * 1000).toLocaleTimeString("en-US")})`);
-        }
-    }
-
 
     // check all nfts
     try {
