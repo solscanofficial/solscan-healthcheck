@@ -713,7 +713,7 @@ const CHECK_LIST = {
     },
     nftCheck: {
         healthCheckFunction: nftCheck,
-        timeThreshold: 30 * 60, // if no new block in 1800 seconds (30min), alert
+        timeThreshold: 2 * 60 * 60,
     },
     validatorCheck: {
         healthCheckFunction: validatorCheck,
