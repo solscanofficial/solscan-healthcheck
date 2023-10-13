@@ -13,6 +13,7 @@ const {
     OK,
     ERROR
 } = require('./index.js')
+const {getProApiHealthCheckData} = require("./pro-api.solscan.io");
 
 
 const main = async () => {
@@ -35,6 +36,18 @@ const main = async () => {
         let publicApiData = await getPublicApiHealthCheckData(process.env.PUBLIC_API_ENDPOINT)
         if (publicApiData && publicApiData.length) {
             for (const e of publicApiData) {
+                if (e.status === ERROR) {
+                    errors.push(...e.errors)
+                }
+            }
+        }
+    }
+
+    // PRO API
+    if (process.env.IS_CHECK_PRO_API === 'true') {
+        let proApiData = await getProApiHealthCheckData(process.env.PRO_API_ENDPOINT)
+        if (proApiData && proApiData.length) {
+            for (const e of proApiData) {
                 if (e.status === ERROR) {
                     errors.push(...e.errors)
                 }
@@ -66,4 +79,4 @@ const main = async () => {
     console.log(`Finish, check process took ${end - start} ms`);
 }
 
-main()
+main();

@@ -544,20 +544,20 @@ const nftCheck = async (solscanEndpoint, timeThreshold) => {
         errors.push(`[Solscan NFT API] Failed to get NFT trades ${err}`);
     }
 
-    if (latestTrade) {
-        let now = Date.now() / 1000;
-        if (now - latestTrade.tradeTime > timeThreshold) {
-            errors.push(`[Solscan NFT API] No NFT trades since ${formatDistance(
-                latestTrade.tradeTime * 1000,
-                new Date(),
-                {
-                    addSuffix: true,
-                }
-            )} (${new Date(latestTrade.tradeTime * 1000).toLocaleTimeString(
-                "en-US"
-            )})`);
-        }
-    }
+    // if (latestTrade) {
+    //     let now = Date.now() / 1000;
+    //     if (now - latestTrade.tradeTime > timeThreshold) {
+    //         errors.push(`[Solscan NFT API] No NFT trades since ${formatDistance(
+    //             latestTrade.tradeTime * 1000,
+    //             new Date(),
+    //             {
+    //                 addSuffix: true,
+    //             }
+    //         )} (${new Date(latestTrade.tradeTime * 1000).toLocaleTimeString(
+    //             "en-US"
+    //         )})`);
+    //     }
+    // }
 
     // check nft collections
     try {
