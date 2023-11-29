@@ -534,12 +534,11 @@ const nftCheck = async (solscanEndpoint, timeThreshold) => {
         const {data} = await axios.get(
             `${solscanEndpoint}/nft/market/trade?offset=0&limit=1`
         );
-        if (!data || !data.data || !data.data[0] || !data.data[0].tradeTime) {
+        if (!data || !data.success) {
             errors.push(`[Solscan NFT API] Failed to get NFT trades (${solscanEndpoint}/nft/market/trade?offset=0&limit=1). Response data ${JSON.stringify(data)}`);
         } else {
             console.log(`[Solscan NFT API] Get NFT trades success.`);
         }
-        latestTrade = data.data[0];
     } catch (err) {
         errors.push(`[Solscan NFT API] Failed to get NFT trades (${solscanEndpoint}/nft/market/trade?offset=0&limit=1). Error: ${err}`);
     }
@@ -564,12 +563,7 @@ const nftCheck = async (solscanEndpoint, timeThreshold) => {
         const {data} = await axios.get(
             `${solscanEndpoint}/collection?sortBy=volume`
         );
-        if (
-            !data ||
-            !data.success ||
-            !data.data ||
-            !data.data[0]
-        ) {
+        if (!data || !data.success) {
             errors.push(`[Solscan NFT API] Failed to get NFT collections (${solscanEndpoint}/collection?sortBy=volume). Data: ${JSON.stringify(data)}`);
         } else {
             console.log(`[Solscan NFT API] Get NFT collections success.`);
