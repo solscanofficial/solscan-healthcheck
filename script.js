@@ -64,9 +64,10 @@ const main = async () => {
 
     // sending notifications
     if (errors.length > 0) {
-        let msg = process.env.PREFIX_MESSAGE + "\n" + errors.join("\n")
-        notifySlack(msg, process.env.SLACK_HOOK_KEY, process.env.SLACK_CHANNEL, process.env.SLACK_BOTNAME, process.env.SLACK_BOT_ICON)
-        notifyTelegram(msg, process.env.TELEGRAM_TOKEN, process.env.TELEGRAM_CHAT, true)
+        let msgSlack = process.env.PREFIX_MESSAGE + "\n" + errors.join("\n")
+        let msgTele = process.env.PREFIX_MESSAGE + "\n" + errors.join("\n\n")
+        notifySlack(msgSlack, process.env.SLACK_HOOK_KEY, process.env.SLACK_CHANNEL, process.env.SLACK_BOTNAME, process.env.SLACK_BOT_ICON)
+        notifyTelegram(msgTele, process.env.TELEGRAM_TOKEN, process.env.TELEGRAM_CHAT, true)
     }
 
     // console.log --- just for local testing
