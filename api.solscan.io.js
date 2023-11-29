@@ -116,7 +116,7 @@ const transactionCheck = async (solscanEndpoint, timeThreshold) => {
         // check a random old transaction
         txUrl = `${solscanEndpoint}/transaction?tx=${SAMPLE_OLD_TRANSACTION}`;
         const {data: oldTxDetail} = await axios.get(txUrl);
-        if (!oldTxDetail || oldTxDetail.txHash !== SAMPLE_OLD_TRANSACTION) {
+        if (!oldTxDetail || !oldTxDetail.success) {
             errors.push(`[Solscan Transaction API] Failed to get detail of an old transaction (${txUrl}). TxDetail: ${JSON.stringify(oldTxDetail)}`);
         } else {
             console.log("[Solscan Transaction API] Get old transaction detail success.");
@@ -126,7 +126,7 @@ const transactionCheck = async (solscanEndpoint, timeThreshold) => {
         if (latestTxHash) {
             txUrl = `${solscanEndpoint}/transaction?tx=${latestTxHash}`;
             const {data: txDetail} = await axios.get(txUrl);
-            if (!txDetail || txDetail.txHash !== latestTxHash) {
+            if (!txDetail || !txDetail.success) {
                 errors.push(`[Solscan Transaction API] Failed to get detail of the latest transaction (${txUrl}). Response: ${JSON.stringify(txDetail)}`);
             } else {
                 console.log("[Solscan Transaction API] Get the latest transaction detail success.");
@@ -137,7 +137,7 @@ const transactionCheck = async (solscanEndpoint, timeThreshold) => {
             txUrl = `${solscanEndpoint}/transaction/overview?tx=${latestTxHash}`;
             const {data: overview} = await axios.get(txUrl);
 
-            if (!overview || overview.txHash !== latestTxHash) {
+            if (!overview || !overview.success) {
                 errors.push(`[Solscan Transaction API] Failed to get overview of transaction (${txUrl}). Response data is ${JSON.stringify(overview)}`);
             } else {
                 console.log("[Solscan Transaction API] Get overview of latest transaction success.");
@@ -176,7 +176,7 @@ const splTransferCheck = async (solscanEndpoint, timeThreshold) => {
             `${solscanEndpoint}/account/token/txs?address=${SAMPLE_ADDRESS}`
         );
 
-        if (!data || !data.data) {
+        if (!data || !data.success) {
             errors.push(`[Solscan Account API] Failed to get SplTransfer of account (${solscanEndpoint}/account/token/txs?address=${SAMPLE_ADDRESS}). Response data is ${JSON.stringify(data)}`);
         } else {
             console.log(`[Solscan Account API] Get SplTransfer of account ${SAMPLE_ADDRESS} success.`);
@@ -205,7 +205,7 @@ const solTransferCheck = async (solscanEndpoint, timeThreshold) => {
             `${solscanEndpoint}/account/soltransfer/txs?address=${SAMPLE_ADDRESS}`
         );
 
-        if (!data || !data.data) {
+        if (!data || !data.success) {
             errors.push(`[Solscan Account API] Failed to get SolTransfer of account (${solscanEndpoint}/account/soltransfer/txs?address=${SAMPLE_ADDRESS}). Response data is ${JSON.stringify(data)}`);
         } else {
             console.log(`[Solscan Account API] Get SolTransfer of account ${SAMPLE_ADDRESS} success.`);
