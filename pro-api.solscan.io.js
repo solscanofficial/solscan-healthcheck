@@ -28,12 +28,12 @@ const nftCheck = async (solscanEndpoint, timeThreshold) => {
             `${solscanEndpoint}/nft/token/info/${SAMPLE_NFT}`
         );
         if (!data || data.status !== 1) {
-            errors.push(`${PREFIX} Failed to get info of nft token ${SAMPLE_NFT}. Response data ${JSON.stringify(data)}`);
+            errors.push(`${PREFIX} Failed to get info of nft token (${solscanEndpoint}/nft/token/info/${SAMPLE_NFT}). Response data ${JSON.stringify(data)}`);
         } else {
             console.log(`${PREFIX} Get info of nft token success.`);
         }
     } catch (err) {
-        errors.push(`${PREFIX} Failed to get info of nft token ${SAMPLE_NFT}: ${err.message}`);
+        errors.push(`${PREFIX} Failed to get info of nft token (${solscanEndpoint}/nft/token/info/${SAMPLE_NFT}). Error: ${err.message}`);
     }
 
     // endpoint: /nft/token/ownership/{address}
@@ -42,12 +42,12 @@ const nftCheck = async (solscanEndpoint, timeThreshold) => {
             `${solscanEndpoint}/nft/token/ownership/${SAMPLE_NFT}`
         );
         if (!data || data.status !== 1) {
-            errors.push(`${PREFIX} Failed to get ownership of nft token ${SAMPLE_NFT}. Response data ${JSON.stringify(data)}`);
+            errors.push(`${PREFIX} Failed to get ownership of nft token (${solscanEndpoint}/nft/token/ownership/${SAMPLE_NFT}). Response data ${JSON.stringify(data)}`);
         } else {
             console.log(`${PREFIX} Get ownership of nft token success.`);
         }
     } catch (err) {
-        errors.push(`${PREFIX} Failed to get ownership of nft token ${SAMPLE_NFT}: ${err.message}`);
+        errors.push(`${PREFIX} Failed to get ownership of nft token (${solscanEndpoint}/nft/token/ownership/${SAMPLE_NFT}). Error: ${err.message}`);
     }
 
     // endpoint: /nft/wallet/list_nft/{address}
@@ -56,12 +56,12 @@ const nftCheck = async (solscanEndpoint, timeThreshold) => {
             `${solscanEndpoint}/nft/wallet/list_nft/${SAMPLE_NFT_WALLET}`
         );
         if (!data || data.status !== 1) {
-            errors.push(`${PREFIX} Failed to get list nft of wallet ${SAMPLE_NFT_WALLET}. Response data ${JSON.stringify(data)}`);
+            errors.push(`${PREFIX} Failed to get list nft of wallet (${solscanEndpoint}/nft/wallet/list_nft/${SAMPLE_NFT_WALLET}). Response data ${JSON.stringify(data)}`);
         } else {
             console.log(`${PREFIX} Get list nft of wallet success.`);
         }
     } catch (err) {
-        errors.push(`${PREFIX} Failed to get list nft of wallet ${SAMPLE_NFT_WALLET}: ${err.message}`);
+        errors.push(`${PREFIX} Failed to get list nft of wallet (${solscanEndpoint}/nft/wallet/list_nft/${SAMPLE_NFT_WALLET}). Error: ${err.message}`);
     }
 
     // endpoint: /nft/wallet/activity/{address}
@@ -70,12 +70,12 @@ const nftCheck = async (solscanEndpoint, timeThreshold) => {
             `${solscanEndpoint}/nft/wallet/activity/${SAMPLE_NFT_WALLET}`
         );
         if (!data || data.status !== 1) {
-            errors.push(`${PREFIX} Failed to get nft activities of wallet ${SAMPLE_NFT_WALLET}. Response data ${JSON.stringify(data)}`);
+            errors.push(`${PREFIX} Failed to get nft activities of wallet (${solscanEndpoint}/nft/wallet/activity/${SAMPLE_NFT_WALLET}). Response data ${JSON.stringify(data)}`);
         } else {
             console.log(`${PREFIX} Get nft activities of wallet success.`);
         }
     } catch (err) {
-        errors.push(`${PREFIX} Failed to get nft activities of wallet ${SAMPLE_NFT_WALLET}: ${err.message}`);
+        errors.push(`${PREFIX} Failed to get nft activities of wallet (${solscanEndpoint}/nft/wallet/activity/${SAMPLE_NFT_WALLET}). Error: ${err.message}`);
     }
 
     // endpoint: /nft/collection/list
@@ -84,12 +84,12 @@ const nftCheck = async (solscanEndpoint, timeThreshold) => {
             `${solscanEndpoint}/nft/collection/list?search=${SAMPLE_NFT_COLLECTION_ID}`
         );
         if (!data || data.status !== 1) {
-            errors.push(`${PREFIX} Failed to get list nft collection. Response data ${JSON.stringify(data)}`);
+            errors.push(`${PREFIX} Failed to get list nft collection (${solscanEndpoint}/nft/collection/list?search=${SAMPLE_NFT_COLLECTION_ID}). Response data ${JSON.stringify(data)}`);
         } else {
             console.log(`${PREFIX} Get list nft collection success.`);
         }
     } catch (err) {
-        errors.push(`${PREFIX} Failed to get list nft collection: ${err.message}`);
+        errors.push(`${PREFIX} Failed to get list nft collection (${solscanEndpoint}/nft/collection/list?search=${SAMPLE_NFT_COLLECTION_ID}). Error: ${err.message}`);
     }
 
     // endpoint: /nft/collection/list_nft/{address}
@@ -98,12 +98,12 @@ const nftCheck = async (solscanEndpoint, timeThreshold) => {
             `${solscanEndpoint}/nft/collection/list_nft/${SAMPLE_NFT_COLLECTION_ID}`
         );
         if (!data || data.status !== 1) {
-            errors.push(`${PREFIX} Failed to get list nft of collection ${SAMPLE_NFT_COLLECTION_ID}. Response data ${JSON.stringify(data)}`);
+            errors.push(`${PREFIX} Failed to get list nft of collection (${solscanEndpoint}/nft/collection/list_nft/${SAMPLE_NFT_COLLECTION_ID}). Response data ${JSON.stringify(data)}`);
         } else {
             console.log(`${PREFIX} Get list nft of collection success.`);
         }
     } catch (err) {
-        errors.push(`${PREFIX} Failed to get list nft of collection ${SAMPLE_NFT_COLLECTION_ID}: ${err.message}`);
+        errors.push(`${PREFIX} Failed to get list nft of collection (${solscanEndpoint}/nft/collection/list_nft/${SAMPLE_NFT_COLLECTION_ID}). Error: ${err.message}`);
     }
 
     // endpoint: /nft/collection/activity/{address}
@@ -112,12 +112,12 @@ const nftCheck = async (solscanEndpoint, timeThreshold) => {
             `${solscanEndpoint}/nft/collection/activity/${SAMPLE_NFT_COLLECTION_ID}`
         );
         if (!data || data.status !== 1) {
-            errors.push(`${PREFIX} Failed to get list activities of nft collection ${SAMPLE_NFT_COLLECTION_ID}. Response data ${JSON.stringify(data)}`);
+            errors.push(`${PREFIX} Failed to get list activities of nft collection (${solscanEndpoint}/nft/collection/activity/${SAMPLE_NFT_COLLECTION_ID}). Response data ${JSON.stringify(data)}`);
         } else {
             console.log(`${PREFIX} Get list activities of nft collection success.`);
         }
     } catch (err) {
-        errors.push(`${PREFIX} Failed to get list activities of nft collection ${SAMPLE_NFT_COLLECTION_ID}: ${err.message}`);
+        errors.push(`${PREFIX} Failed to get list activities of nft collection (${solscanEndpoint}/nft/collection/activity/${SAMPLE_NFT_COLLECTION_ID}). Error: ${err.message}`);
     }
 
     // endpoint: /nft/collection/price/{address}
@@ -126,12 +126,12 @@ const nftCheck = async (solscanEndpoint, timeThreshold) => {
             `${solscanEndpoint}/nft/collection/price/${SAMPLE_NFT_COLLECTION_ID}`
         );
         if (!data || data.status !== 1) {
-            errors.push(`${PREFIX} Failed to get price of nft collection ${SAMPLE_NFT_COLLECTION_ID}. Response data ${JSON.stringify(data)}`);
+            errors.push(`${PREFIX} Failed to get price of nft collection (${solscanEndpoint}/nft/collection/price/${SAMPLE_NFT_COLLECTION_ID}). Response data ${JSON.stringify(data)}`);
         } else {
             console.log(`${PREFIX} Get price of nft collection success.`);
         }
     } catch (err) {
-        errors.push(`${PREFIX} Failed to get price of nft collection ${SAMPLE_NFT_COLLECTION_ID}: ${err.message}`);
+        errors.push(`${PREFIX} Failed to get price of nft collection (${solscanEndpoint}/nft/collection/price/${SAMPLE_NFT_COLLECTION_ID}). Error: ${err.message}`);
     }
 
     // endpoint: /nft/collection/holders/{address}
@@ -140,12 +140,12 @@ const nftCheck = async (solscanEndpoint, timeThreshold) => {
             `${solscanEndpoint}/nft/collection/holders/${SAMPLE_NFT_COLLECTION_ID}`
         );
         if (!data || data.status !== 1) {
-            errors.push(`${PREFIX} Failed to get holders of nft collection ${SAMPLE_NFT_COLLECTION_ID}. Response data ${JSON.stringify(data)}`);
+            errors.push(`${PREFIX} Failed to get holders of nft collection (${solscanEndpoint}/nft/collection/holders/${SAMPLE_NFT_COLLECTION_ID}). Response data ${JSON.stringify(data)}`);
         } else {
             console.log(`${PREFIX} Get price of nft collection success.`);
         }
     } catch (err) {
-        errors.push(`${PREFIX} Failed to get holders of nft collection ${SAMPLE_NFT_COLLECTION_ID}: ${err.message}`);
+        errors.push(`${PREFIX} Failed to get holders of nft collection (${solscanEndpoint}/nft/collection/holders/${SAMPLE_NFT_COLLECTION_ID}). Error: ${err.message}`);
     }
 
     if (errors.length > 0) {
@@ -165,10 +165,12 @@ const blockCheck = async (solscanEndpoint, timeThreshold) => {
     let latestBlockNumber;
 
     // endpoint: /block/last
+    let blockUrl = "";
     try {
-        const {data} = await getData(`${solscanEndpoint}/block/last?limit=5`);
+        blockUrl = `${solscanEndpoint}/block/last?limit=5`;
+        const {data} = await getData(blockUrl);
         if (!data || !data[0]) {
-            errors.push(`${PREFIX} Failed to get last block. Response data ${JSON.stringify(data)}`);
+            errors.push(`${PREFIX} Failed to get last block (${blockUrl}). Response data ${JSON.stringify(data)}`);
         } else {
             console.log(`${PREFIX} Get latest block success`);
 
@@ -196,11 +198,10 @@ const blockCheck = async (solscanEndpoint, timeThreshold) => {
 
         // endpoint: /block/transaction
         if (latestBlockNumber) {
-            const {data} = await getData(
-                `${solscanEndpoint}/block/transactions?block=${latestBlockNumber}`
-            );
+            blockUrl = `${solscanEndpoint}/block/transactions?block=${latestBlockNumber}`;
+            const {data} = await getData(blockUrl);
             if (!data) {
-                errors.push(`${PREFIX} Failed to get block transaction. Response data ${JSON.stringify(data)}`);
+                errors.push(`${PREFIX} Failed to get block transaction (${blockUrl}). Response data ${JSON.stringify(data)}`);
             } else {
                 console.log(`${PREFIX} Get transactions of block success`);
             }
@@ -208,17 +209,16 @@ const blockCheck = async (solscanEndpoint, timeThreshold) => {
 
         // endpoint: /block/${block}
         if (latestBlockNumber) {
-            const {data} = await getData(
-                `${solscanEndpoint}/block/${latestBlockNumber}`
-            );
+            blockUrl = `${solscanEndpoint}/block/${latestBlockNumber}`;
+            const {data} = await getData(blockUrl);
             if (!data || !data.currentSlot || !data.result) {
-                errors.push(`${PREFIX} Failed to get block detail. Response data ${JSON.stringify(data)}`);
+                errors.push(`${PREFIX} Failed to get block detail (${blockUrl}). Response data ${JSON.stringify(data)}`);
             } else {
                 console.log(`${PREFIX} Get block info success`);
             }
         }
     } catch (err) {
-        errors.push(`${PREFIX} Block API is down: ${err.message}`);
+        errors.push(`${PREFIX} Block API is down (${blockUrl}). Error: ${err.message}`);
     }
 
     if (errors.length > 0) {
@@ -236,13 +236,13 @@ const blockCheck = async (solscanEndpoint, timeThreshold) => {
 const transactionCheck = async (solscanEndpoint, timeThreshold) => {
     let errors = [];
 
+    let txUrl = "";
     try {
         // endpoint: /transaction/last
-        const {data} = await getData(
-            `${solscanEndpoint}/transaction/last?limit=1`
-        );
+        txUrl = `${solscanEndpoint}/transaction/last?limit=1`;
+        const {data} = await getData(txUrl);
         if (!data || !data[0]) {
-            errors.push(`${PREFIX} Failed to get last transaction. Response data ${JSON.stringify(data)}`);
+            errors.push(`${PREFIX} Failed to get last transaction (${txUrl}). Response data ${JSON.stringify(data)}`);
         } else {
             console.log(`${PREFIX} Get last transaction success`);
         }
@@ -256,11 +256,10 @@ const transactionCheck = async (solscanEndpoint, timeThreshold) => {
         }
 
         if (latestSig) {
-            const {data: txDetail} = await getData(
-                `${solscanEndpoint}/transaction/${latestSig}`
-            );
+            txUrl = `${solscanEndpoint}/transaction/${latestSig}`;
+            const {data: txDetail} = await getData(txUrl);
             if (!txDetail || txDetail.txHash !== latestSig) {
-                errors.push(`${PREFIX} Failed to get transaction detail. Response data ${JSON.stringify(txDetail)}`);
+                errors.push(`${PREFIX} Failed to get transaction detail (${txUrl}). Response data ${JSON.stringify(txDetail)}`);
             } else {
                 console.log(`${PREFIX} Get transaction detail success.`);
             }
@@ -279,7 +278,7 @@ const transactionCheck = async (solscanEndpoint, timeThreshold) => {
             }
         }
     } catch (err) {
-        errors.push(`${PREFIX} Transaction API is down: ${err.message}`);
+        errors.push(`${PREFIX} Transaction API is down (${txUrl}). Error: ${err.message}`);
     }
 
     if (errors.length > 0) {
@@ -303,12 +302,12 @@ const accountCheck = async (solscanEndpoint, timeThreshold) => {
             `${solscanEndpoint}/account/tokens?account=${SAMPLE_ADDRESS}`
         );
         if (!data || !data[0] || !data[0].tokenAddress) {
-            errors.push(`${PREFIX} Failed to get tokens of account ${SAMPLE_ADDRESS}. Response data ${JSON.stringify(data)}`);
+            errors.push(`${PREFIX} Failed to get tokens of account (${solscanEndpoint}/account/tokens?account=${SAMPLE_ADDRESS}). Response data ${JSON.stringify(data)}`);
         } else {
             console.log(`${PREFIX} Get tokens of account success.`);
         }
     } catch (err) {
-        errors.push(`${PREFIX} Failed to get tokens of account ${SAMPLE_ADDRESS}: ${err.message}`)
+        errors.push(`${PREFIX} Failed to get tokens of account (${solscanEndpoint}/account/tokens?account=${SAMPLE_ADDRESS}). Error: ${err.message}`)
     }
 
     // endpoint: /account/transactions
@@ -317,12 +316,12 @@ const accountCheck = async (solscanEndpoint, timeThreshold) => {
             `${solscanEndpoint}/account/transactions?account=${SAMPLE_ADDRESS}&limit=1`
         );
         if (!data || !data[0] || !data[0].txHash) {
-            errors.push(`${PREFIX} Failed to get transactions of account ${SAMPLE_ADDRESS}. Response data ${JSON.stringify(data)}`);
+            errors.push(`${PREFIX} Failed to get transactions of account (${solscanEndpoint}/account/transactions?account=${SAMPLE_ADDRESS}&limit=1). Response data ${JSON.stringify(data)}`);
         } else {
             console.log(`${PREFIX} Get transactions of account success.`);
         }
     } catch (err) {
-        errors.push(`${PREFIX} Failed to get transactions of account ${SAMPLE_ADDRESS}: ${err.message}`);
+        errors.push(`${PREFIX} Failed to get transactions of account (${solscanEndpoint}/account/transactions?account=${SAMPLE_ADDRESS}&limit=1). Error: ${err.message}`);
     }
 
     // endpoint: /account/stakeAccounts
@@ -331,12 +330,12 @@ const accountCheck = async (solscanEndpoint, timeThreshold) => {
             `${solscanEndpoint}/account/stakeAccounts?account=${SAMPLE_ADDRESS}`
         );
         if (!data) {
-            errors.push(`${PREFIX} Failed to get stake accounts of account ${SAMPLE_ADDRESS}. Response data ${JSON.stringify(data)}`);
+            errors.push(`${PREFIX} Failed to get stake accounts of account (${solscanEndpoint}/account/stakeAccounts?account=${SAMPLE_ADDRESS}). Response data ${JSON.stringify(data)}`);
         } else {
             console.log(`${PREFIX} Get stake accounts of account success.`);
         }
     } catch (err) {
-        errors.push(`${PREFIX} Failed to get stake accounts of account ${SAMPLE_ADDRESS}: ${err.message}`);
+        errors.push(`${PREFIX} Failed to get stake accounts of account (${solscanEndpoint}/account/stakeAccounts?account=${SAMPLE_ADDRESS}). Error: ${err.message}`);
     }
 
     // endpoint: /account/solTransfers
@@ -345,12 +344,12 @@ const accountCheck = async (solscanEndpoint, timeThreshold) => {
             `${solscanEndpoint}/account/solTransfers?account=${SAMPLE_ADDRESS}&limit=1`
         );
         if (!data || !data.data || !data.data[0] || !data.data[0].txHash) {
-            errors.push(`${PREFIX} Failed to get SolTransfer of account ${SAMPLE_ADDRESS}. Response data ${JSON.stringify(data)}`);
+            errors.push(`${PREFIX} Failed to get SolTransfer of account (${solscanEndpoint}/account/solTransfers?account=${SAMPLE_ADDRESS}&limit=1). Response data ${JSON.stringify(data)}`);
         } else {
             console.log(`${PREFIX} Get SolTransfer success.`);
         }
     } catch (err) {
-        errors.push(`${PREFIX} Failed to get SolTransfer of account ${SAMPLE_ADDRESS}: ${err.message}`);
+        errors.push(`${PREFIX} Failed to get SolTransfer of account (${solscanEndpoint}/account/solTransfers?account=${SAMPLE_ADDRESS}&limit=1). Error: ${err.message}`);
     }
 
     // endpoint: /account/splTransfers
@@ -359,12 +358,12 @@ const accountCheck = async (solscanEndpoint, timeThreshold) => {
             `${solscanEndpoint}/account/splTransfers?account=${SAMPLE_ADDRESS}&limit=1`
         );
         if (!data || !data.data || !data.data[0] || !data.data[0].tokenAddress) {
-            errors.push(`${PREFIX} Failed to get SplTransfer of account ${SAMPLE_ADDRESS}. Response data ${JSON.stringify(data)}`);
+            errors.push(`${PREFIX} Failed to get SplTransfer of account (${solscanEndpoint}/account/splTransfers?account=${SAMPLE_ADDRESS}&limit=1). Response data ${JSON.stringify(data)}`);
         } else {
             console.log(`${PREFIX} Get SplTransfer success.`);
         }
     } catch (err) {
-        errors.push(`${PREFIX} Failed to get SplTransfer of account ${SAMPLE_ADDRESS}: ${err.message}`);
+        errors.push(`${PREFIX} Failed to get SplTransfer of account (${solscanEndpoint}/account/splTransfers?account=${SAMPLE_ADDRESS}&limit=1). Error: ${err.message}`);
     }
 
     // endpoint: /account/${account}
@@ -373,12 +372,12 @@ const accountCheck = async (solscanEndpoint, timeThreshold) => {
             `${solscanEndpoint}/account/${SAMPLE_ADDRESS}`
         );
         if (!data || !data.type || data.account !== SAMPLE_ADDRESS) {
-            errors.push(`${PREFIX} Failed to get AccountData of account ${SAMPLE_ADDRESS}. Response data ${JSON.stringify(data)}`);
+            errors.push(`${PREFIX} Failed to get AccountData of account (${solscanEndpoint}/account/${SAMPLE_ADDRESS}). Response data ${JSON.stringify(data)}`);
         } else {
             console.log(`${PREFIX} Get info of account success.`);
         }
     } catch (err) {
-        errors.push(`${PREFIX} Failed to get AccountData of account ${SAMPLE_ADDRESS}: ${err.message}`);
+        errors.push(`${PREFIX} Failed to get AccountData of account (${solscanEndpoint}/account/${SAMPLE_ADDRESS}). Error: ${err.message}`);
     }
 
     if (errors.length > 0) {
@@ -402,12 +401,12 @@ const tokenCheck = async (solscanEndpoint, timeThreshold) => {
             `${solscanEndpoint}/token/list?offset=0&limit=5&sortBy=market_cap&direction=desc`
         );
         if (!data || !data.data || !data.data[0] || !data.data[0].mintAddress) {
-            errors.push(`${PREFIX} Failed to get TokenList. Response data ${JSON.stringify(data)}`);
+            errors.push(`${PREFIX} Failed to get TokenList (${solscanEndpoint}/token/list?offset=0&limit=5&sortBy=market_cap&direction=desc). Response data ${JSON.stringify(data)}`);
         } else {
             console.log(`${PREFIX} Get token list success.`);
         }
     } catch (err) {
-        errors.push(`${PREFIX} Failed to get TokenList: ${err.message}`);
+        errors.push(`${PREFIX} Failed to get TokenList (${solscanEndpoint}/token/list?offset=0&limit=5&sortBy=market_cap&direction=desc). Error: ${err.message}`);
     }
 
     // endpoint: /token/meta
@@ -416,12 +415,12 @@ const tokenCheck = async (solscanEndpoint, timeThreshold) => {
             `${solscanEndpoint}/token/meta?tokenAddress=${SAMPLE_TOKEN}`
         );
         if (!data || !data.symbol) {
-            errors.push(`${PREFIX} Failed to get TokenMetadata of ${SAMPLE_TOKEN}. Response data ${JSON.stringify(data)}`);
+            errors.push(`${PREFIX} Failed to get TokenMetadata (${solscanEndpoint}/token/meta?tokenAddress=${SAMPLE_TOKEN}). Response data ${JSON.stringify(data)}`);
         } else {
             console.log(`${PREFIX} Get token meta success.`);
         }
     } catch (err) {
-        errors.push(`${PREFIX} Failed to get TokenMetadata of ${SAMPLE_TOKEN}: ${err.message}`);
+        errors.push(`${PREFIX} Failed to get TokenMetadata (${solscanEndpoint}/token/meta?tokenAddress=${SAMPLE_TOKEN}). Error: ${err.message}`);
     }
 
     // endpoint: /token/holders
@@ -430,12 +429,12 @@ const tokenCheck = async (solscanEndpoint, timeThreshold) => {
             `${solscanEndpoint}/token/holders?tokenAddress=${SAMPLE_TOKEN}&offset=0&size=5`
         );
         if (!data) {
-            errors.push(`${PREFIX} Failed to get Token Holder of ${SAMPLE_TOKEN}. Response data ${JSON.stringify(data)}`);
+            errors.push(`${PREFIX} Failed to get Token Holder (${solscanEndpoint}/token/holders?tokenAddress=${SAMPLE_TOKEN}&offset=0&size=5). Response data ${JSON.stringify(data)}`);
         } else {
             console.log(`${PREFIX} Get token holders success.`);
         }
     } catch (err) {
-        errors.push(`${PREFIX} Failed to get Token Holder of ${SAMPLE_TOKEN}: ${err.message}`);
+        errors.push(`${PREFIX} Failed to get Token Holder (${solscanEndpoint}/token/holders?tokenAddress=${SAMPLE_TOKEN}&offset=0&size=5). Error: ${err.message}`);
     }
 
     if (errors.length > 0) {
@@ -459,12 +458,12 @@ const otherCheck = async (solscanEndpoint, timeThreshold) => {
             `${solscanEndpoint}/market/token/${SAMPLE_TOKEN}`
         );
         if (!data) {
-            errors.push(`${PREFIX} Failed to get market info of token ${SAMPLE_TOKEN}. Response data ${JSON.stringify(data)}`);
+            errors.push(`${PREFIX} Failed to get market info of token (${solscanEndpoint}/market/token/${SAMPLE_TOKEN}). Response data ${JSON.stringify(data)}`);
         } else {
             console.log(`${PREFIX} Get market info of token success.`);
         }
     } catch (err) {
-        errors.push(`${PREFIX} Failed to get market info of token ${SAMPLE_TOKEN}: ${err.message}`);
+        errors.push(`${PREFIX} Failed to get market info of token (${solscanEndpoint}/market/token/${SAMPLE_TOKEN}). Error: ${err.message}`);
     }
 
     if (errors.length > 0) {
