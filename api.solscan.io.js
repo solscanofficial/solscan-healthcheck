@@ -24,7 +24,7 @@ const blockCheck = async (solscanEndpoint, timeThreshold) => {
         // check list
         blockUrl = `${solscanEndpoint}/block/last?q=1`;
         const {data} = await axios.get(blockUrl);
-        if (!data || !data[0]) {
+        if (!data || !data.success || !data.data) {
             errors.push(`[Solscan Block API] Failed to get the latest block (${blockUrl}). Response data is ${JSON.stringify(data)}`);
         } else {
             console.log("[Solscan Block API] Get the latest block success.");
@@ -84,7 +84,7 @@ const transactionCheck = async (solscanEndpoint, timeThreshold) => {
     try {
         txUrl = `${solscanEndpoint}/transaction/last?q=10`;
         const {data} = await axios.get(txUrl);
-        if (!data || !data[0]) {
+        if (!data || !data.success || !data.data) {
             errors.push(`[Solscan Transaction API] Failed to get last transactions (${txUrl}). Response data is ${JSON.stringify(data)}`);
         } else {
             console.log("[Solscan Transaction API] Get last 20 transactions success.");
