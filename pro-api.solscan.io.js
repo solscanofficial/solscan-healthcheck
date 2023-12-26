@@ -11,12 +11,34 @@ const SAMPLE_NFT_COLLECTION_ID = "229f30fb8b5f0a7ff7fea1acd51bd102be43fe02e8d1c2
 
 const PREFIX = "[PRO-API]";
 const TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjcmVhdGVkQXQiOjE2NzIyOTgxNzg4MjEsImVtYWlsIjoiaGFkb0B0b21vY2hhaW4uY29tIiwiYWN0aW9uIjoidG9rZW4tYXBpIiwiaWF0IjoxNjcyMjk4MTc4fQ.tuZ37k3W5ZdW6Rb3GlrFgvMKmDCCzKuXsWaNcj5Pzv4";
+const RETRY = 3;
 
-const getData = async (url) => {
+const request = async (url) => {
     const headers = {
         "token": TOKEN
     }
     return await axios.get(url, {headers: headers});
+}
+
+const getData = async (url) => {
+    let result = null;
+    let count = 0;
+    while (result === null && count < RETRY) {
+        try {
+            let data = await request(url);
+            if (data) {
+                result = data;
+            } else {
+                count += 1;
+            }
+        } catch (err) {
+            count += 1;
+            if (count >= RETRY) {
+                throw err;
+            }
+        }
+    }
+    return result;
 }
 
 const nftCheck = async (solscanEndpoint, timeThreshold) => {

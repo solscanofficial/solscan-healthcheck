@@ -15,6 +15,32 @@ const SAMPLE_ACC_ADDR_PROGRAM = 'LendZqTs7gn5CTSJU1jWKhKuVpjJGom45nnwPb2AMTi'; /
 const SAMPLE_TOKEN = `SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt`; // SRM
 const SAMPLE_OLD_TRANSACTION = '2cbw5sBvusbsmV2GKe9JLPivug2jvL6k1hWkxBhWYC5jUmpkyyFn673uM8xeMvrhpcbRTv53rkYkMaLafF6QYDBo';
 const SAMPLE_ADDRESS_FOR_AMM = '58oQChx4yWmvKdwLLZzBi4ChoCc2fqCUWBkwMihLYQo2';  // SOL-USDC pair
+const RETRY = 3;
+
+const request = async (url) => {
+    return await axios.get(url);
+}
+
+const getData = async (url) => {
+    let result = null;
+    let count = 0;
+    while (result === null && count < RETRY) {
+        try {
+            let data = await request(url);
+            if (data) {
+                result = data;
+            } else {
+                count += 1;
+            }
+        } catch (err) {
+            count += 1;
+            if (count >= RETRY) {
+                throw err;
+            }
+        }
+    }
+    return result;
+}
 
 const blockCheck = async (solscanEndpoint, timeThreshold) => {
     let errors = [];
@@ -23,7 +49,7 @@ const blockCheck = async (solscanEndpoint, timeThreshold) => {
     try {
         // check list
         blockUrl = `${solscanEndpoint}/block/last?q=1`;
-        const {data} = await axios.get(blockUrl);
+        const {data} = await getData(blockUrl);
         if (!data || !data.success || !data.data) {
             errors.push(`[Solscan Block API] Failed to get the latest block (${blockUrl}). Response data is ${JSON.stringify(data)}`);
         } else {
@@ -54,7 +80,7 @@ const blockCheck = async (solscanEndpoint, timeThreshold) => {
         // check block detail
         if (currentSlot) {
             blockUrl = `${solscanEndpoint}/block?block=${currentSlot}`;
-            const {data} = await axios.get(blockUrl);
+            const {data} = await getData(blockUrl);
             if (!data) {
                 errors.push(`[Solscan Block API] Failed to get info of block (${blockUrl}). Response data is ${JSON.stringify(data)}`);
             } else {
@@ -83,7 +109,7 @@ const transactionCheck = async (solscanEndpoint, timeThreshold) => {
     let txUrl = "";
     try {
         txUrl = `${solscanEndpoint}/transaction/last?q=10`;
-        const {data} = await axios.get(txUrl);
+        const {data} = await getData(txUrl);
         if (!data || !data.success || !data.data) {
             errors.push(`[Solscan Transaction API] Failed to get last transactions (${txUrl}). Response data is ${JSON.stringify(data)}`);
         } else {
@@ -115,7 +141,7 @@ const transactionCheck = async (solscanEndpoint, timeThreshold) => {
 
         // check a random old transaction
         txUrl = `${solscanEndpoint}/transaction?tx=${SAMPLE_OLD_TRANSACTION}`;
-        const {data: oldTxDetail} = await axios.get(txUrl);
+        const {data: oldTxDetail} = await getData(txUrl);
         if (!oldTxDetail || !oldTxDetail.success) {
             errors.push(`[Solscan Transaction API] Failed to get detail of an old transaction (${txUrl}). TxDetail: ${JSON.stringify(oldTxDetail)}`);
         } else {
@@ -125,7 +151,7 @@ const transactionCheck = async (solscanEndpoint, timeThreshold) => {
         // check transaction detail API
         if (latestTxHash) {
             txUrl = `${solscanEndpoint}/transaction?tx=${latestTxHash}`;
-            const {data: txDetail} = await axios.get(txUrl);
+            const {data: txDetail} = await getData(txUrl);
             if (!txDetail || !txDetail.success) {
                 errors.push(`[Solscan Transaction API] Failed to get detail of the latest transaction (${txUrl}). Response: ${JSON.stringify(txDetail)}`);
             } else {
@@ -135,7 +161,7 @@ const transactionCheck = async (solscanEndpoint, timeThreshold) => {
 
             // check transaction overview
             txUrl = `${solscanEndpoint}/transaction/overview?tx=${latestTxHash}`;
-            const {data: overview} = await axios.get(txUrl);
+            const {data: overview} = await getData(txUrl);
 
             if (!overview || !overview.success) {
                 errors.push(`[Solscan Transaction API] Failed to get overview of transaction (${txUrl}). Response data is ${JSON.stringify(overview)}`);
@@ -145,7 +171,7 @@ const transactionCheck = async (solscanEndpoint, timeThreshold) => {
 
             // check transaction status
             txUrl = `${solscanEndpoint}/transaction/status?tx=${latestTxHash}`;
-            const {data: status} = await axios.get(txUrl);
+            const {data: status} = await getData(txUrl);
             if (!status || !status.success) {
                 errors.push(`[Solscan Transaction API] Failed to get status of transaction (${txUrl}). Response data is ${JSON.stringify(status)}`);
             } else {
@@ -172,7 +198,7 @@ const splTransferCheck = async (solscanEndpoint, timeThreshold) => {
     let errors = [];
 
     try {
-        const {data} = await axios.get(
+        const {data} = await getData(
             `${solscanEndpoint}/account/token/txs?address=${SAMPLE_ADDRESS}`
         );
 
@@ -201,7 +227,7 @@ const solTransferCheck = async (solscanEndpoint, timeThreshold) => {
     let errors = [];
 
     try {
-        const {data} = await axios.get(
+        const {data} = await getData(
             `${solscanEndpoint}/account/soltransfer/txs?address=${SAMPLE_ADDRESS}`
         );
 
@@ -234,7 +260,7 @@ const accountCheck = async (solscanEndpoint, timeThreshold) => {
     try {
         // wallet
         check_token = SAMPLE_ADDRESS;
-        const {data: wallet} = await axios.get(
+        const {data: wallet} = await getData(
             `${solscanEndpoint}/account?address=${SAMPLE_ADDRESS}`
         );
         if (!wallet || !wallet.success || !wallet.data) {
@@ -245,7 +271,7 @@ const accountCheck = async (solscanEndpoint, timeThreshold) => {
 
         // token
         check_token = SAMPLE_TOKEN;
-        const {data: token} = await axios.get(
+        const {data: token} = await getData(
             `${solscanEndpoint}/account?address=${SAMPLE_TOKEN}`
         );
         if (!token || !token.success || !token.data) {
@@ -256,7 +282,7 @@ const accountCheck = async (solscanEndpoint, timeThreshold) => {
 
         // token account
         check_token = SAMPLE_ACC_ADDR_TOKEN_ACC;
-        const {data: token_acc} = await axios.get(
+        const {data: token_acc} = await getData(
             `${solscanEndpoint}/account?address=${SAMPLE_ACC_ADDR_TOKEN_ACC}`
         );
         if (!token_acc || !token_acc.success || !token_acc.data) {
@@ -267,7 +293,7 @@ const accountCheck = async (solscanEndpoint, timeThreshold) => {
 
         // program
         check_token = SAMPLE_ACC_ADDR_PROGRAM;
-        const {data: program} = await axios.get(
+        const {data: program} = await getData(
             `${solscanEndpoint}/account?address=${SAMPLE_ACC_ADDR_PROGRAM}`
         );
         if (!program || !program.success || !program.data) {
@@ -281,7 +307,7 @@ const accountCheck = async (solscanEndpoint, timeThreshold) => {
 
     // check account tokens
     try {
-        const {data: acc_tokens} = await axios.get(
+        const {data: acc_tokens} = await getData(
             `${solscanEndpoint}/account/tokens?address=${SAMPLE_ADDRESS}`
         );
         if (!acc_tokens || !acc_tokens.success) {
@@ -295,7 +321,7 @@ const accountCheck = async (solscanEndpoint, timeThreshold) => {
 
     // check account transaction
     try {
-        const {data} = await axios.get(
+        const {data} = await getData(
             `${solscanEndpoint}/account/transaction?address=${SAMPLE_ADDRESS}`
         );
         if (!data || !data.success) {
@@ -309,7 +335,7 @@ const accountCheck = async (solscanEndpoint, timeThreshold) => {
 
     // check account stake
     try {
-        const {data} = await axios.get(
+        const {data} = await getData(
             `${solscanEndpoint}/account/stake?address=${SAMPLE_STAKE_ACC}`
         );
         if (!data || !data.success) {
@@ -323,7 +349,7 @@ const accountCheck = async (solscanEndpoint, timeThreshold) => {
 
     // check account token txs
     try {
-        const {data} = await axios.get(
+        const {data} = await getData(
             `${solscanEndpoint}/account/token/txs?address=${SAMPLE_ADDRESS}&token_address=${SAMPLE_TOKEN}`
         );
         if (!data || !data.success) {
@@ -337,7 +363,7 @@ const accountCheck = async (solscanEndpoint, timeThreshold) => {
 
     // check account transaction token
     try {
-        const {data} = await axios.get(
+        const {data} = await getData(
             `${solscanEndpoint}/account/transaction/token?address=${SAMPLE_STAKE_ACC}`
         );
         if (!data || !data.success) {
@@ -366,7 +392,7 @@ const tokenCheck = async (solscanEndpoint, timeThreshold) => {
 
     try {
         // check list
-        const {data} = await axios.get(
+        const {data} = await getData(
             `${solscanEndpoint}/tokens?offset=0&limit=5&sortby=market_cap&sorttype=desc`
         );
         if (
@@ -387,7 +413,7 @@ const tokenCheck = async (solscanEndpoint, timeThreshold) => {
 
     // check meta
     try {
-        const {data: meta} = await axios.get(
+        const {data: meta} = await getData(
             `${solscanEndpoint}/token/meta?token=${SAMPLE_TOKEN}`
         );
 
@@ -402,7 +428,7 @@ const tokenCheck = async (solscanEndpoint, timeThreshold) => {
 
     // check holders
     try {
-        const {data: holders} = await axios.get(
+        const {data: holders} = await getData(
             `${solscanEndpoint}/token/holders?offset=0&size=10&token=${SAMPLE_TOKEN}`
         );
 
@@ -417,7 +443,7 @@ const tokenCheck = async (solscanEndpoint, timeThreshold) => {
 
     // check holder statistic
     try {
-        const {data: holderStatistic} = await axios.get(
+        const {data: holderStatistic} = await getData(
             `${solscanEndpoint}/token/holder/statistic/total?tokenAddress=${SAMPLE_TOKEN}`
         );
 
@@ -447,7 +473,7 @@ const defiCheck = async (solscanEndpoint, timeThreshold) => {
 
     // check all
     try {
-        const {data} = await axios.get(`${solscanEndpoint}/amm/all`);
+        const {data} = await getData(`${solscanEndpoint}/amm/all`);
         if (!data || !data.data || !data.data[0] || !data.data[0].address) {
             errors.push(`[Solscan AMM API] Failed to get all AMMs (${solscanEndpoint}/amm/all). Response data ${JSON.stringify(data)}`);
         } else {
@@ -459,7 +485,7 @@ const defiCheck = async (solscanEndpoint, timeThreshold) => {
 
     // check reads
     try {
-        const {data} = await axios.get(
+        const {data} = await getData(
             `${solscanEndpoint}/amm/reads?source=raydium&keyword=sol&offset=0&limit=1`
         );
         if (
@@ -479,7 +505,7 @@ const defiCheck = async (solscanEndpoint, timeThreshold) => {
 
     // check pairs
     try {
-        const {data} = await axios.get(
+        const {data} = await getData(
             `${solscanEndpoint}/amm/pairs?source=raydium`
         );
         if (
@@ -499,7 +525,7 @@ const defiCheck = async (solscanEndpoint, timeThreshold) => {
 
     // check read
     try {
-        const {data} = await axios.get(
+        const {data} = await getData(
             `${solscanEndpoint}/amm/read?address=${SAMPLE_ADDRESS_FOR_AMM}`
         );
         if (!data || !data.data || !data.data.address) {
@@ -531,7 +557,7 @@ const nftCheck = async (solscanEndpoint, timeThreshold) => {
 
     // check nft trade
     try {
-        const {data} = await axios.get(
+        const {data} = await getData(
             `${solscanEndpoint}/nft/market/trade?offset=0&limit=1`
         );
         if (!data || !data.success) {
@@ -560,7 +586,7 @@ const nftCheck = async (solscanEndpoint, timeThreshold) => {
 
     // check nft collections
     try {
-        const {data} = await axios.get(
+        const {data} = await getData(
             `${solscanEndpoint}/collection?sortBy=volume`
         );
         if (!data || !data.success) {
@@ -575,7 +601,7 @@ const nftCheck = async (solscanEndpoint, timeThreshold) => {
 
     // check new nft
     try {
-        const {data} = await axios.get(
+        const {data} = await getData(
             `${solscanEndpoint}/nft?sortBy=createdTime`
         );
         if (
@@ -595,7 +621,7 @@ const nftCheck = async (solscanEndpoint, timeThreshold) => {
 
     // check all nfts
     try {
-        const {data} = await axios.get(
+        const {data} = await getData(
             `${solscanEndpoint}/nft?sortBy=tradeTime`
         );
         if (
@@ -628,7 +654,7 @@ const validatorCheck = async (solscanEndpoint, timeThreshold) => {
 
     // check list
     try {
-        const {data} = await axios.get(
+        const {data} = await getData(
             `${solscanEndpoint}/validator/list?offset=0&limit=20`
         );
         if (!data || !data.data || !data.data.items || !data.data.items[0]) {
@@ -642,7 +668,7 @@ const validatorCheck = async (solscanEndpoint, timeThreshold) => {
 
     // check version
     try {
-        const {data} = await axios.get(
+        const {data} = await getData(
             `${solscanEndpoint}/validator/version`
         );
         if (!data || !data.data || !data.data || !data.data.items || !data.data.items[0]) {
@@ -656,7 +682,7 @@ const validatorCheck = async (solscanEndpoint, timeThreshold) => {
 
     // check leader schedule
     try {
-        const {data} = await axios.get(
+        const {data} = await getData(
             `${solscanEndpoint}/validator/leader_schedule?offset=0&limit=10`
         );
         if (!data || !data.data || !data.data || !data.data.items || !data.data.items[0]) {
