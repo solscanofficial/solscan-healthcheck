@@ -261,7 +261,7 @@ const transactionCheck = async (solscanEndpoint, timeThreshold) => {
     let txUrl = "";
     try {
         // endpoint: /transaction/last
-        txUrl = `${solscanEndpoint}/transaction/last?limit=1`;
+        txUrl = `${solscanEndpoint}/transaction/last?limit=10`;
         const {data} = await getData(txUrl);
         if (!data || !data[0]) {
             errors.push(`${PREFIX} Failed to get last transaction (${txUrl}). Response data ${JSON.stringify(data)}`);
