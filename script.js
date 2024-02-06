@@ -23,12 +23,16 @@ const main = async () => {
     let start = Date.now();
 
     // check gcp node health
-    const getHealth = {"jsonrpc": "2.0", "id": 1, "method": "getHealth"}
-    const {data: res} = await axios.post(process.env.NODE_RPC_ENDPOINT, getHealth);
-    if (!res || res.error) {
-        errors.push(`[Solana node] GCP node is unhealthy with error: ${JSON.stringify(res.error)}`);
-    } else {
-        console.log("[Solana node] GCP node is healthy");
+    try {
+        const getHealth = {"jsonrpc": "2.0", "id": 1, "method": "getHealth"}
+        const {data: res} = await axios.post(process.env.NODE_RPC_ENDPOINT, getHealth);
+        if (!res || res.error) {
+            errors.push(`[Solana node] GCP node is unhealthy, error: ${JSON.stringify(res.error)}`);
+        } else {
+            console.log("[Solana node] GCP node is healthy");
+        }
+    } catch (err) {
+        errors.push(`[Solana node] GCP node is unhealthy, error: ${err}`);
     }
 
     // Backend
