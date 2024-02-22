@@ -40,13 +40,15 @@ const main = async () => {
     let start = Date.now();
 
     // check health
-    let listNode = process.env.NODE_RPC_ENDPOINT;
-    if (listNode) {
-        listNode = listNode.split(",");
-        for (let node of listNode) {
-            let err = await checkNode(node);
-            if (err.length > 0) {
-                errors.push(...err);
+    if (process.env.IS_CHECK_NODE === 'true') {
+        let listNode = process.env.NODE_RPC_ENDPOINT;
+        if (listNode) {
+            listNode = listNode.split(",");
+            for (let node of listNode) {
+                let err = await checkNode(node);
+                if (err.length > 0) {
+                    errors.push(...err);
+                }
             }
         }
     }
