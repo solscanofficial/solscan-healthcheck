@@ -17,22 +17,38 @@ const {getProApiHealthCheckData} = require("./pro-api.solscan.io");
 const axios = require("axios");
 
 
+const checkNode = async (node) => {
+    let errors = [];
+    try {
+        const getHealth = {"jsonrpc": "2.0", "id": 1, "method": "getHealth"}
+        const {data: res} = await axios.post(node, getHealth);
+        if (!res || res.error) {
+            errors.push(`[Solana node] Node (${node}) is unhealthy, error: ${JSON.stringify(res.error)}`);
+        } else {
+            console.log(`[Solana node] Node (${node}) is healthy`);
+        }
+    } catch (err) {
+        errors.push(`[Solana node] Node (${node}) is unhealthy, error: ${err}`);
+    }
+
+    return errors;
+}
+
 const main = async () => {
     let errors = []
 
     let start = Date.now();
 
-    // check gcp node health
-    try {
-        const getHealth = {"jsonrpc": "2.0", "id": 1, "method": "getHealth"}
-        const {data: res} = await axios.post(process.env.NODE_RPC_ENDPOINT, getHealth);
-        if (!res || res.error) {
-            errors.push(`[Solana node] GCP node is unhealthy, error: ${JSON.stringify(res.error)}`);
-        } else {
-            console.log("[Solana node] GCP node is healthy");
+    // check health
+    let listNode = process.env.NODE_RPC_ENDPOINT;
+    if (listNode) {
+        listNode = listNode.split(",");
+        for (let node of listNode) {
+            let err = await checkNode(node);
+            if (err.length > 0) {
+                errors.push(...err);
+            }
         }
-    } catch (err) {
-        errors.push(`[Solana node] GCP node is unhealthy, error: ${err}`);
     }
 
     // Backend
