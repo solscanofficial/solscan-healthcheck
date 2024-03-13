@@ -501,9 +501,9 @@ const otherCheck = async (solscanEndpoint, timeThreshold) => {
 };
 
 const PRO_API_CHECK_LIST = {
-    nft: {
-        healthCheckFunction: nftCheck,
-    },
+    // nft: {
+    //     healthCheckFunction: nftCheck,
+    // },
     block: {
         healthCheckFunction: blockCheck,
         timeThreshold: 5 * 60,
