@@ -182,6 +182,77 @@ const nftCheck = async (solscanEndpoint, timeThreshold) => {
     };
 };
 
+const nftPublicCheck = async (solscanEndpoint, timeThreshold) => {
+    let errors = [];
+
+    // endpoint: /public/nft/activity/newest
+    try {
+        const {data} = await getData(
+            `${solscanEndpoint}/public/nft/activity/newest`
+        );
+        if (!data || data.status !== 1) {
+            errors.push(`${PREFIX} Failed to get nft activity (${solscanEndpoint}/public/nft/activity/newest). Response data ${JSON.stringify(data)}`);
+        } else {
+            console.log(`${PREFIX} Get nft activity success.`);
+        }
+    } catch (err) {
+        errors.push(`${PREFIX} Failed to get nft activity (${solscanEndpoint}/public/nft/activity/newest). Error: ${err.message}`);
+    }
+
+    // endpoint: /public/common/chaininfo
+    try {
+        const {data} = await getData(
+            `${solscanEndpoint}/public/common/chaininfo`
+        );
+        if (!data || data.status !== 1) {
+            errors.push(`${PREFIX} Failed to get chaininfo (${solscanEndpoint}/public/common/chaininfo). Response data ${JSON.stringify(data)}`);
+        } else {
+            console.log(`${PREFIX} Get chaininfo success.`);
+        }
+    } catch (err) {
+        errors.push(`${PREFIX} Failed to get chaininfo (${solscanEndpoint}/public/common/chaininfo). Error: ${err.message}`);
+    }
+
+    // endpoint: /public/nft/collection/overview
+    try {
+        const {data} = await getData(
+            `${solscanEndpoint}/public/nft/collection/overview?sort_by=volume&offset=0&limit=15&range=30&sort_order=desc`
+        );
+        if (!data || data.status !== 1) {
+            errors.push(`${PREFIX} Failed to get collection overview (${solscanEndpoint}/public/nft/collection/overview?sort_by=volume&offset=0&limit=15&range=30&sort_order=desc). Response data ${JSON.stringify(data)}`);
+        } else {
+            console.log(`${PREFIX} Get collection overview success.`);
+        }
+    } catch (err) {
+        errors.push(`${PREFIX} Failed to get collection overview (${solscanEndpoint}/public/nft/collection/overview?sort_by=volume&offset=0&limit=15&range=30&sort_order=desc). Error: ${err.message}`);
+    }
+
+    // endpoint: /public/nft/collection/stats
+    try {
+        const {data} = await getData(
+            `${solscanEndpoint}/public/nft/collection/stats?collectionId=495539003c8cb96c5b19d5ab40604b9dc913d008fd3c177b6753a4d1756f867e&filter=volumes&range=7`
+        );
+        if (!data || data.status !== 1) {
+            errors.push(`${PREFIX} Failed to get collection stats (${solscanEndpoint}/public/nft/collection/stats?collectionId=495539003c8cb96c5b19d5ab40604b9dc913d008fd3c177b6753a4d1756f867e&filter=volumes&range=7). Response data ${JSON.stringify(data)}`);
+        } else {
+            console.log(`${PREFIX} Get collection stats success.`);
+        }
+    } catch (err) {
+        errors.push(`${PREFIX} Failed to get collection stats (${solscanEndpoint}/public/nft/collection/stats?collectionId=495539003c8cb96c5b19d5ab40604b9dc913d008fd3c177b6753a4d1756f867e&filter=volumes&range=7). Error: ${err.message}`);
+    }
+
+    if (errors.length > 0) {
+        return {
+            status: ERROR,
+            errors: errors
+        }
+    }
+
+    return {
+        status: OK,
+    };
+};
+
 const blockCheck = async (solscanEndpoint, timeThreshold) => {
     let errors = [];
     let latestBlockNumber;
@@ -504,6 +575,9 @@ const PRO_API_CHECK_LIST = {
     // nft: {
     //     healthCheckFunction: nftCheck,
     // },
+    nft_public: {
+        healthCheckFunction: nftPublicCheck
+    },
     block: {
         healthCheckFunction: blockCheck,
         timeThreshold: 5 * 60,
