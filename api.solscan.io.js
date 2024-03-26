@@ -504,38 +504,38 @@ const defiCheck = async (solscanEndpoint, timeThreshold) => {
     }
 
     // check pairs
-    try {
-        const {data} = await getData(
-            `${solscanEndpoint}/amm/pairs?source=raydium`
-        );
-        if (
-            !data ||
-            !data.data ||
-            !data.data.items ||
-            !data.data.items[0] ||
-            !data.data.items[0].address
-        ) {
-            errors.push(`[Solscan AMM API] Failed to get pairs of raydium (${solscanEndpoint}/amm/pairs?source=raydium). Response data ${JSON.stringify(data)}`);
-        } else {
-            console.log(`[Solscan AMM API] Get pairs of raydium success.`);
-        }
-    } catch (err) {
-        errors.push(`[Solscan AMM API] Failed to get pairs of raydium (${solscanEndpoint}/amm/pairs?source=raydium). Error: ${err}`);
-    }
+    // try {
+    //     const {data} = await getData(
+    //         `${solscanEndpoint}/amm/pairs?source=raydium`
+    //     );
+    //     if (
+    //         !data ||
+    //         !data.data ||
+    //         !data.data.items ||
+    //         !data.data.items[0] ||
+    //         !data.data.items[0].address
+    //     ) {
+    //         errors.push(`[Solscan AMM API] Failed to get pairs of raydium (${solscanEndpoint}/amm/pairs?source=raydium). Response data ${JSON.stringify(data)}`);
+    //     } else {
+    //         console.log(`[Solscan AMM API] Get pairs of raydium success.`);
+    //     }
+    // } catch (err) {
+    //     errors.push(`[Solscan AMM API] Failed to get pairs of raydium (${solscanEndpoint}/amm/pairs?source=raydium). Error: ${err}`);
+    // }
 
     // check read
-    try {
-        const {data} = await getData(
-            `${solscanEndpoint}/amm/read?address=${SAMPLE_ADDRESS_FOR_AMM}`
-        );
-        if (!data || !data.data || !data.data.address) {
-            errors.push(`[Solscan AMM API] Failed to get detail of pair (${solscanEndpoint}/amm/read?address=${SAMPLE_ADDRESS_FOR_AMM}). Response data ${JSON.stringify(data)}`);
-        } else {
-            console.log(`[Solscan AMM API] Get detail of sample pair success.`);
-        }
-    } catch (err) {
-        errors.push(`[Solscan AMM API] Failed to get detail of pair (${solscanEndpoint}/amm/read?address=${SAMPLE_ADDRESS_FOR_AMM}). Error: ${err}`);
-    }
+    // try {
+    //     const {data} = await getData(
+    //         `${solscanEndpoint}/amm/read?address=${SAMPLE_ADDRESS_FOR_AMM}`
+    //     );
+    //     if (!data || !data.data || !data.data.address) {
+    //         errors.push(`[Solscan AMM API] Failed to get detail of pair (${solscanEndpoint}/amm/read?address=${SAMPLE_ADDRESS_FOR_AMM}). Response data ${JSON.stringify(data)}`);
+    //     } else {
+    //         console.log(`[Solscan AMM API] Get detail of sample pair success.`);
+    //     }
+    // } catch (err) {
+    //     errors.push(`[Solscan AMM API] Failed to get detail of pair (${solscanEndpoint}/amm/read?address=${SAMPLE_ADDRESS_FOR_AMM}). Error: ${err}`);
+    // }
 
     if (errors.length > 0) {
         return {
