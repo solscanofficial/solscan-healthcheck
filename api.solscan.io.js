@@ -626,8 +626,7 @@ const nftCheck = async (solscanEndpoint, timeThreshold) => {
         );
         if (
             !data ||
-            !data.data ||
-            !data.data[0]
+            !data.success
         ) {
             errors.push(`[Solscan NFT API] Failed to get all NFTs (${solscanEndpoint}/nft?sortBy=tradeTime). Response data is ${JSON.stringify(data)}`);
         } else {
