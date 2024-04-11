@@ -12,7 +12,7 @@ const SAMPLE_STAKE_ACC = '9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM';
 const SAMPLE_ADDRESS = SAMPLE_STAKE_ACC;
 const SAMPLE_ACC_ADDR_TOKEN_ACC = 'FGETo8T8wMcN2wCjav8VK6eh3dLk63evNDPxzLSJra8B'; // USDC of 9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM
 const SAMPLE_ACC_ADDR_PROGRAM = 'LendZqTs7gn5CTSJU1jWKhKuVpjJGom45nnwPb2AMTi'; // Lending program
-const SAMPLE_TOKEN = `SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt`; // SRM
+const SAMPLE_TOKEN = `EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v`; // USDC
 const SAMPLE_OLD_TRANSACTION = '2cbw5sBvusbsmV2GKe9JLPivug2jvL6k1hWkxBhWYC5jUmpkyyFn673uM8xeMvrhpcbRTv53rkYkMaLafF6QYDBo';
 const SAMPLE_ADDRESS_FOR_AMM = '58oQChx4yWmvKdwLLZzBi4ChoCc2fqCUWBkwMihLYQo2';  // SOL-USDC pair
 const RETRY = 3;
@@ -157,7 +157,6 @@ const transactionCheck = async (solscanEndpoint, timeThreshold) => {
             } else {
                 console.log("[Solscan Transaction API] Get the latest transaction detail success.");
             }
-
 
             // check transaction overview
             txUrl = `${solscanEndpoint}/transaction/overview?tx=${latestTxHash}`;
@@ -453,7 +452,36 @@ const tokenCheck = async (solscanEndpoint, timeThreshold) => {
             console.log(`[Solscan Token API] Get holder statistic of token ${SAMPLE_TOKEN} success.`);
         }
     } catch (err) {
-        errors.push(`[Solscan Token API] Failed to get holders of token (${solscanEndpoint}/token/holder/statistic/total?tokenAddress=${SAMPLE_TOKEN}): ${err}`);
+        errors.push(`[Solscan Token API] Failed to get holder statistic of token (${solscanEndpoint}/token/holder/statistic/total?tokenAddress=${SAMPLE_TOKEN}): ${err}`);
+    }
+
+    // check transfers
+    try {
+        const {data: transfers} = await getData(
+            `${solscanEndpoint}/transfer/token?token_address=${SAMPLE_TOKEN}&limit=10&offset=0&type=all`
+        );
+
+        if (!transfers || !transfers.success || !transfers.items || !transfers.items[0]) {
+            errors.push(`[Solscan Token API] Failed to get transfers of token (${solscanEndpoint}/transfer/token?token_address=${SAMPLE_TOKEN}&limit=10&offset=0&type=all). Response data is ${JSON.stringify(transfers)}`);
+        } else {
+            console.log(`[Solscan Token API] Get transfers of token ${SAMPLE_TOKEN} success.`);
+
+            // check time
+            let transfer = transfers.items[0];
+            let blockTime = transfer.blockTime;
+            let distance = Date.now() / 1000 - blockTime;
+            if (distance > timeThreshold) {
+                errors.push(`[Solscan Token API] No new transfers since ${formatDistance(
+                    blockTime * 1000,
+                    new Date(),
+                    {
+                        addSuffix: true,
+                    }
+                )}`);
+            }
+        }
+    } catch (err) {
+        errors.push(`[Solscan Token API] Failed to get transfers of token (${solscanEndpoint}/transfer/token?token_address=${SAMPLE_TOKEN}&limit=10&offset=0&type=all): ${err}`);
     }
 
     if (errors.length > 0) {
@@ -725,6 +753,7 @@ const CHECK_LIST = {
     },
     token: {
         healthCheckFunction: tokenCheck,
+        timeThreshold: 5 * 60,
     },
     defi: {
         healthCheckFunction: defiCheck,
