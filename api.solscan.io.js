@@ -461,13 +461,13 @@ const tokenCheck = async (solscanEndpoint, timeThreshold) => {
             `${solscanEndpoint}/transfer/token?token_address=${SAMPLE_TOKEN}&limit=10&offset=0&type=all`
         );
 
-        if (!transfers || !transfers.success || !transfers.items || !transfers.items[0]) {
+        if (!transfers || !transfers.success || !transfers.data || !transfers.data.items || !transfers.data.items[0]) {
             errors.push(`[Solscan Token API] Failed to get transfers of token (${solscanEndpoint}/transfer/token?token_address=${SAMPLE_TOKEN}&limit=10&offset=0&type=all). Response data is ${JSON.stringify(transfers)}`);
         } else {
             console.log(`[Solscan Token API] Get transfers of token ${SAMPLE_TOKEN} success.`);
 
             // check time
-            let transfer = transfers.items[0];
+            let transfer = transfers.data.items[0];
             let blockTime = transfer.blockTime;
             let distance = Date.now() / 1000 - blockTime;
             if (distance > timeThreshold) {
