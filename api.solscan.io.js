@@ -514,7 +514,7 @@ const defiCheck = async (solscanEndpoint, timeThreshold) => {
     // check reads
     try {
         const {data} = await getData(
-            `${solscanEndpoint}/amm/reads?source=raydium&keyword=sol&offset=0&limit=1`
+            `${solscanEndpoint}/amm/reads?source=raydium&offset=0&limit=1`
         );
         if (
             !data ||
