@@ -39,6 +39,27 @@ const main = async () => {
 
     let start = Date.now();
 
+    // check disk if rabbitmq
+    if (process.env.IS_CHECK_RABBITMQ_DISK === "true") {
+        try {
+            const {data} = await axios.get(process.env.CHECK_RABBITMQ_DISK_API);
+            if (data) {
+                let path = data.diskPath;
+                let total = data.size;
+                let used = data.size - data.free;
+
+                if (path === "/data") {
+                    let usedPercent = used / total * 100;
+                    if (usedPercent > 5) {
+                        errors.push(`[RabbitMQ] Used disk is increasing, maybe something has problem. Path=${path}, used: ${Math.round(used / (1024 * 1024 * 1024))}GB, used percent: ${Math.round(usedPercent * 100) / 100}%`)
+                    }
+                }
+            }
+        } catch (err) {
+            console.error("Error when checking rabbitmq disk:", err);
+        }
+    }
+
     // check health
     if (process.env.IS_CHECK_NODE === 'true') {
         let listNode = process.env.NODE_RPC_ENDPOINT;
