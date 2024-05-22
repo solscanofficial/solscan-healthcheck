@@ -3,7 +3,7 @@ const {OK, ERROR} = require("./status");
 
 
 const PREFIX = "[PUBLIC-API]";
-const TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjcmVhdGVkQXQiOjE2NzIyOTgxNzg4MjEsImVtYWlsIjoiaGFkb0B0b21vY2hhaW4uY29tIiwiYWN0aW9uIjoidG9rZW4tYXBpIiwiaWF0IjoxNjcyMjk4MTc4fQ.tuZ37k3W5ZdW6Rb3GlrFgvMKmDCCzKuXsWaNcj5Pzv4";
+const TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjcmVhdGVkQXQiOjE3MTYzNDc3MjE4NTIsImVtYWlsIjoiaGFkb0B0b21vY2hhaW4uY29tIiwiYWN0aW9uIjoidG9rZW4tYXBpIiwiaWF0IjoxNzE2MzQ3NzIxfQ.xst23pjYJ9Xsu9BtaxtOCJHyV9RbU1t44gWNQouh9Tg";
 const RETRY = 3;
 
 const request = async (url) => {
