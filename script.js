@@ -2,19 +2,19 @@ const path = require('path')
 require('dotenv').config({
     path: path.resolve(__dirname, './.env')
 })
-
 const noti_bot = require('noti_bot')
 const notifyTelegram = noti_bot.telegram
 const notifySlack = noti_bot.slack
-
+const {createClient} = require('@clickhouse/client');
 const {
-    getHealthCheckData,
+    checkAPI,
     getPublicApiHealthCheckData,
     OK,
     ERROR
 } = require('./index.js')
 const {getProApiHealthCheckData} = require("./pro-api.solscan.io");
 const axios = require("axios");
+const {checkAPIV2} = require("./api-v2.solscan.io");
 
 
 const checkNode = async (node) => {
@@ -29,6 +29,30 @@ const checkNode = async (node) => {
         }
     } catch (err) {
         errors.push(`[Solana node] Node (${node}) is unhealthy, error: ${err}`);
+    }
+
+    return errors;
+}
+
+const checkClickhouse = async (node) => {
+    let errors = [];
+    try {
+        const client = createClient({
+            url: node,
+            username: process.env.CLICKHOUSE_USER,
+            password: process.env.CLICKHOUSE_PASSWD,
+            request_timeout: 60000,
+            max_open_connections: 10
+        })
+
+        const resultSet = await client.query({
+            query: "SELECT 1",
+            format: 'JSONEachRow',
+        })
+        const dataset = await resultSet.text()
+        console.log("Query node", node, "ok:", dataset);
+    } catch (err) {
+        errors.push(`[Clickhouse node] Node ${node} is unhealthy. Error: ${err}`);
     }
 
     return errors;
@@ -74,8 +98,33 @@ const main = async () => {
         }
     }
 
-    // Backend
-    let data = await getHealthCheckData(process.env.SOLSCAN_ENDPOINT)
+    if (process.env.IS_CHECK_CLICKHOUSE === "true") {
+        let listNode = process.env.CLICKHOUSE_NODES;
+        if (listNode) {
+            listNode = listNode.split(",");
+            for (let node of listNode) {
+                let err = await checkClickhouse(node);
+                if (err.length > 0) {
+                    errors.push(...err);
+                }
+            }
+        }
+    }
+
+    // API v2
+    if (process.env.IS_CHECK_SOLSCAN_API_V2 === "true") {
+        let dataV2 = await checkAPIV2(process.env.SOLSCAN_ENDPOINT_V2)
+        if (dataV2 && dataV2.length) {
+            for (const e of dataV2) {
+                if (e.status === ERROR) {
+                    errors.push(...e.errors)
+                }
+            }
+        }
+    }
+
+    // API
+    let data = await checkAPI(process.env.SOLSCAN_ENDPOINT)
     if (data && data.length) {
         for (const e of data) {
             if (e.status === ERROR) {
