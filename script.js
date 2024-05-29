@@ -45,12 +45,12 @@ const checkClickhouse = async (node) => {
             max_open_connections: 10
         })
 
-        const resultSet = await client.query({
-            query: "SELECT 1",
-            format: 'JSONEachRow',
-        })
-        const dataset = await resultSet.text()
-        console.log("Query node", node, "ok:", dataset);
+        const result = await client.ping();
+        if (!result.success) {
+            errors.push(`[Clickhouse node] Node ${node} is unhealthy. Result: ${JSON.stringify(result)}`);
+        }
+        await client.close()
+        console.log("Ping node", node, result);
     } catch (err) {
         errors.push(`[Clickhouse node] Node ${node} is unhealthy. Error: ${err}`);
     }
