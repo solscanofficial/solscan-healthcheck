@@ -11,7 +11,7 @@ const SAMPLE_NFT_COLLECTION_ID = "229f30fb8b5f0a7ff7fea1acd51bd102be43fe02e8d1c2
 const SAMPLE_TX = "2y8xLcUMqinorZ4hhqC9u1nCirEjEocMEaes7CSAAXMKywYMCxuhwbXDdYWRFHV69PX9DcWcRcuxD4ZZ6MnhKiFd";
 
 const PREFIX = "[PRO-API]";
-const TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjcmVhdGVkQXQiOjE3MTYzNDc3MjE4NTIsImVtYWlsIjoiaGFkb0B0b21vY2hhaW4uY29tIiwiYWN0aW9uIjoidG9rZW4tYXBpIiwiaWF0IjoxNzE2MzQ3NzIxfQ.xst23pjYJ9Xsu9BtaxtOCJHyV9RbU1t44gWNQouh9Tg";
+const TOKEN = process.env.PRO_API_TOKEN;
 const RETRY = 3;
 
 const request = async (url) => {
