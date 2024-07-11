@@ -96,7 +96,7 @@ const checkActivitiesData = async (timeThreshold) => {
 
 const CHECK_LIST = {
     activitiesData: {
-        healthCheckFunction: tokenCheck,
+        healthCheckFunction: checkActivitiesData,
         timeThreshold: 1 * 60 * 60
     }
 }
