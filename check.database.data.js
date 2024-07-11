@@ -7,6 +7,12 @@ require('dotenv').config({
 
 const PREFIX = '[Solscan Clickhouse Data]'
 
+function millisToMinutesAndSeconds(millis) {
+    const minutes = Math.floor(millis / 60000);
+    // const seconds = ((millis % 60000) / 1000).toFixed(0);
+    return minutes
+}
+
 const checkActivitiesData = async (timeThreshold) => {
     let errors = [];
     const config_clickhouse = [
@@ -76,8 +82,9 @@ const checkActivitiesData = async (timeThreshold) => {
                 const res = await data.json()
                 if (res && res.length > 0) {
                     const block_time_key = res[0]['block_time_key']
-                    if (today - new Date(Math.abs(block_time_key)) > timeThreshold) {
-                        errors.push(`${PREFIX} No data in ${obj.name} table in clickhouse ${node} in 1 hour ago`);
+                    const distance = today - new Date(Math.abs(block_time_key))
+                    if (distance > timeThreshold) {
+                        errors.push(`${PREFIX} No data in ${obj.name} table in clickhouse ${node} in ${millisToMinutesAndSeconds(distance)} minutes ago`);
                     } else {
                         console.log(`${PREFIX} Data in table ${obj.name} in ${node} up to date`);
                     }
