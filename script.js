@@ -14,6 +14,7 @@ const {
 const {getProApiHealthCheckData} = require("./pro-api.solscan.io");
 const axios = require("axios");
 const {checkAPIV2} = require("./api-v2.solscan.io");
+const {checkClickhouseData} = require("./check.database.data.js")
 
 
 const checkNode = async (node) => {
@@ -152,6 +153,16 @@ const main = async () => {
                 if (e.status === ERROR) {
                     errors.push(...e.errors)
                 }
+            }
+        }
+    }
+
+    // clickhouse data
+    let clickhouseData = await checkClickhouseData()
+    if (clickhouseData && clickhouseData.length) {
+        for (const e of clickhouseData) {
+            if (e.status === ERROR) {
+                errors.push(...e.errors)
             }
         }
     }
