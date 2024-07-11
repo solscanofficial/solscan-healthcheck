@@ -5,6 +5,8 @@ require('dotenv').config({
     path: path.resolve(__dirname, './.env')
 })
 
+const PREFIX = '[Solscan Clickhouse Data]'
+
 const checkActivitiesData = async (timeThreshold) => {
     let errors = [];
     const config_clickhouse = [
@@ -57,7 +59,6 @@ const checkActivitiesData = async (timeThreshold) => {
     const today = new Date().getTime() / 1000
 
     if (listNode) {
-        console.log(listNode);
         listNode = listNode.split(",");
         for (let obj of config_clickhouse) {
             for (let node of listNode) {
@@ -68,7 +69,6 @@ const checkActivitiesData = async (timeThreshold) => {
                     request_timeout: 60000,
                     max_open_connections: 10
                 })
-                console.log(obj.query);
                 let data = await client.query({
                     query: obj.query,
                     format: 'JSONEachRow'
@@ -77,7 +77,9 @@ const checkActivitiesData = async (timeThreshold) => {
                 if (res && res.length > 0) {
                     const block_time_key = res[0]['block_time_key']
                     if (today - new Date(Math.abs(block_time_key)) > timeThreshold) {
-                        errors.push(`[Solscan Clickhouse Data] No data in ${obj.name} table in clickhouse ${node} in 1 hour ago`);
+                        errors.push(`${PREFIX} No data in ${obj.name} table in clickhouse ${node} in 1 hour ago`);
+                    } else {
+                        console.log(`${PREFIX} Data in table ${obj.name} in ${node} up to date`);
                     }
                 }
             }
