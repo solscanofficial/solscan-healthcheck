@@ -135,4 +135,3 @@ const checkClickhouseData = async () => {
 module.exports = {
     checkClickhouseData
 }
-checkActivitiesData(1 * 60 * 60)
