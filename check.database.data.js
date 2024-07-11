@@ -33,56 +33,39 @@ const checkActivitiesData = async (timeThreshold) => {
         {
 
             name: 'fact_token_transfer_activities',
-            query: `SELECT block_time_key FROM solscan.fact_token_transfer_activities
-                WHERE block_id_key = (SELECT min(block_id_key) FROM solscan.fact_token_transfer_activities)
-                AND part_key = {part_key}
-                GROUP BY block_time_key `,
+            query: `SELECT min(block_time_key) as block_time_key FROM solscan.fact_token_transfer_activities
+                WHERE part_key = {part_key}`,
         },
         {
 
             name: 'fact_defi_activities',
-            query: `SELECT block_time_key FROM solscan.fact_defi_activities
-                WHERE block_id_key = (SELECT min(block_id_key) FROM solscan.fact_defi_activities)
-                AND part_key = {part_key}
-                GROUP BY block_time_key `,
+            query: `SELECT min(block_time_key) as block_time_key FROM solscan.fact_defi_activities
+                WHERE part_key = {part_key}`,
         },
         {
 
             name: 'fact_account_transfer_activities',
-            query: `SELECT block_time_key FROM solscan.fact_account_transfer_activities
-                WHERE block_id_key = (SELECT min(block_id_key) FROM solscan.fact_account_transfer_activities)
-                AND part_key = {part_key}
-                GROUP BY block_time_key `,
+            query: `SELECT min(block_time_key) AS block_time_key FROM solscan.fact_account_transfer_activities
+                WHERE part_key = {part_key}`,
         },
         {
 
             name: 'fact_nft_activities',
-            query: `SELECT block_time_key FROM solscan.fact_nft_activities
-                WHERE block_id_key = (SELECT min(block_id_key) FROM solscan.fact_nft_activities)
-                AND part_key = {part_key}
-                GROUP BY block_time_key `,
-        },
-        {
-
-            name: 'fact_account_transfer_activities',
-            query: `SELECT block_time_key FROM solscan.fact_account_transfer_activities
-                WHERE block_id_key = (SELECT min(block_id_key) FROM solscan.fact_account_transfer_activities)
-                AND part_key = {part_key}
-                GROUP BY block_time_key `,
+            query: `SELECT min(block_time_key) as block_time_key FROM solscan.fact_nft_activities
+                WHERE part_key = {part_key}`,
         },
         {
 
             name: 'fact_account_balance_activities',
-            query: `SELECT block_time_key FROM solscan.fact_account_balance_activities
-                WHERE block_id_key = (SELECT min(block_id_key) FROM solscan.fact_account_balance_activities)
-                AND part_key = {part_key}
-                GROUP BY block_time_key `,
+            query: `SELECT min(block_time_key) as block_time_key FROM solscan.fact_account_balance_activities
+                WHERE part_key = {part_key}`,
         }
     ]
 
     let listNode = process.env.CLICKHOUSE_NODES;
 
     const today = new Date().getTime() / 1000
+
     const part_key = getCurrentpartKey()
 
     if (listNode) {
@@ -96,7 +79,6 @@ const checkActivitiesData = async (timeThreshold) => {
                     request_timeout: 60000,
                     max_open_connections: 10
                 })
-
                 obj.query = obj.query.replace("{part_key}", part_key)
 
                 let data = await client.query({
@@ -153,3 +135,4 @@ const checkClickhouseData = async () => {
 module.exports = {
     checkClickhouseData
 }
+checkActivitiesData(1 * 60 * 60)
