@@ -13,6 +13,20 @@ function millisToMinutesAndSeconds(millis) {
     return minutes
 }
 
+function getCurrentpartKey() {
+    var d = new Date(),
+        month = '' + (d.getMonth() + 1),
+        day = '' + d.getDate(),
+        year = d.getFullYear();
+
+    if (month.length < 2) 
+        month = '0' + month;
+    if (day.length < 2) 
+        day = '0' + day;
+
+    return parseInt([year, month].join(''));
+}
+
 const checkActivitiesData = async (timeThreshold) => {
     let errors = [];
     const config_clickhouse = [
@@ -21,6 +35,7 @@ const checkActivitiesData = async (timeThreshold) => {
             name: 'fact_token_transfer_activities',
             query: `SELECT block_time_key FROM solscan.fact_token_transfer_activities
                 WHERE block_id_key = (SELECT min(block_id_key) FROM solscan.fact_token_transfer_activities)
+                AND part_key = {part_key}
                 GROUP BY block_time_key `,
         },
         {
@@ -28,6 +43,7 @@ const checkActivitiesData = async (timeThreshold) => {
             name: 'fact_defi_activities',
             query: `SELECT block_time_key FROM solscan.fact_defi_activities
                 WHERE block_id_key = (SELECT min(block_id_key) FROM solscan.fact_defi_activities)
+                AND part_key = {part_key}
                 GROUP BY block_time_key `,
         },
         {
@@ -35,6 +51,7 @@ const checkActivitiesData = async (timeThreshold) => {
             name: 'fact_account_transfer_activities',
             query: `SELECT block_time_key FROM solscan.fact_account_transfer_activities
                 WHERE block_id_key = (SELECT min(block_id_key) FROM solscan.fact_account_transfer_activities)
+                AND part_key = {part_key}
                 GROUP BY block_time_key `,
         },
         {
@@ -42,6 +59,7 @@ const checkActivitiesData = async (timeThreshold) => {
             name: 'fact_nft_activities',
             query: `SELECT block_time_key FROM solscan.fact_nft_activities
                 WHERE block_id_key = (SELECT min(block_id_key) FROM solscan.fact_nft_activities)
+                AND part_key = {part_key}
                 GROUP BY block_time_key `,
         },
         {
@@ -49,6 +67,7 @@ const checkActivitiesData = async (timeThreshold) => {
             name: 'fact_account_transfer_activities',
             query: `SELECT block_time_key FROM solscan.fact_account_transfer_activities
                 WHERE block_id_key = (SELECT min(block_id_key) FROM solscan.fact_account_transfer_activities)
+                AND part_key = {part_key}
                 GROUP BY block_time_key `,
         },
         {
@@ -56,6 +75,7 @@ const checkActivitiesData = async (timeThreshold) => {
             name: 'fact_account_balance_activities',
             query: `SELECT block_time_key FROM solscan.fact_account_balance_activities
                 WHERE block_id_key = (SELECT min(block_id_key) FROM solscan.fact_account_balance_activities)
+                AND part_key = {part_key}
                 GROUP BY block_time_key `,
         }
     ]
@@ -63,6 +83,7 @@ const checkActivitiesData = async (timeThreshold) => {
     let listNode = process.env.CLICKHOUSE_NODES;
 
     const today = new Date().getTime() / 1000
+    const part_key = getCurrentpartKey()
 
     if (listNode) {
         listNode = listNode.split(",");
@@ -75,6 +96,9 @@ const checkActivitiesData = async (timeThreshold) => {
                     request_timeout: 60000,
                     max_open_connections: 10
                 })
+
+                obj.query = obj.query.replace("{part_key}", part_key)
+
                 let data = await client.query({
                     query: obj.query,
                     format: 'JSONEachRow'
