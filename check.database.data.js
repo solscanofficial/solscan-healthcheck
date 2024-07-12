@@ -70,7 +70,7 @@ const checkActivitiesData = async (timeThreshold) => {
         {
 
             name: 'fact_block_summary_detail',
-            query: `SELECT max(block_time) as data  FROM solscan.fact_block_summary_detail 
+            query: `SELECT max(updated_time) as data  FROM solscan.fact_block_summary_detail 
                 WHERE part_key = {part_key}`,
         }
     ]
