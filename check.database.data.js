@@ -8,7 +8,8 @@ require('dotenv').config({
 const PREFIX = '[Solscan Clickhouse Data]'
 
 function millisToMinutesAndSeconds(millis) {
-    const minutes = Math.floor(millis / 60000);
+    // const minutes = Math.floor(millis / 60000); // mili
+    const minutes = Math.floor(millis / 60);
     // const seconds = ((millis % 60000) / 1000).toFixed(0);
     return minutes
 }
@@ -33,31 +34,43 @@ const checkActivitiesData = async (timeThreshold) => {
         {
 
             name: 'fact_token_transfer_activities',
-            query: `SELECT min(block_time_key) as block_time_key FROM solscan.fact_token_transfer_activities
+            query: `SELECT min(block_time_key) as data FROM solscan.fact_token_transfer_activities
                 WHERE part_key = {part_key}`,
         },
         {
 
             name: 'fact_defi_activities',
-            query: `SELECT min(block_time_key) as block_time_key FROM solscan.fact_defi_activities
+            query: `SELECT min(block_time_key) as data FROM solscan.fact_defi_activities
                 WHERE part_key = {part_key}`,
         },
         {
 
             name: 'fact_account_transfer_activities',
-            query: `SELECT min(block_time_key) AS block_time_key FROM solscan.fact_account_transfer_activities
+            query: `SELECT min(block_time_key) as data FROM solscan.fact_account_transfer_activities
                 WHERE part_key = {part_key}`,
         },
         {
 
             name: 'fact_nft_activities',
-            query: `SELECT min(block_time_key) as block_time_key FROM solscan.fact_nft_activities
+            query: `SELECT min(block_time_key) as data FROM solscan.fact_nft_activities
                 WHERE part_key = {part_key}`,
         },
         {
 
             name: 'fact_account_balance_activities',
-            query: `SELECT min(block_time_key) as block_time_key FROM solscan.fact_account_balance_activities
+            query: `SELECT min(block_time_key) as data FROM solscan.fact_account_balance_activities
+                WHERE part_key = {part_key}`,
+        },
+        {
+
+            name: 'fact_token_price_d',
+            query: `SELECT max(updated_time) as data  FROM solscan.fact_token_price_d 
+                WHERE part_key = {part_key}`,
+        },
+        {
+
+            name: 'fact_block_summary_detail',
+            query: `SELECT max(block_time) as data  FROM solscan.fact_block_summary_detail 
                 WHERE part_key = {part_key}`,
         }
     ]
@@ -87,8 +100,8 @@ const checkActivitiesData = async (timeThreshold) => {
                 })
                 const res = await data.json()
                 if (res && res.length > 0) {
-                    const block_time_key = res[0]['block_time_key']
-                    const distance = today - new Date(Math.abs(block_time_key))
+                    const data = res[0]['data']
+                    const distance = today - new Date(Math.abs(data))
                     if (distance > timeThreshold) {
                         errors.push(`${PREFIX} No data in ${obj.name} table in clickhouse ${node} in ${millisToMinutesAndSeconds(distance)} minutes ago`);
                     } else {
