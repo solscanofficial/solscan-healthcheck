@@ -85,10 +85,6 @@ const checkActivitiesData = async (timeThreshold) => {
         listNode = listNode.split(",");
         for (let obj of config_clickhouse) {
             for (let node of listNode) {
-                // temporary ignore node 4
-                if (node === 'http://clickhouse-04:8123') {
-                    continue;
-                }
                 const client = createClient({
                     url: node,
                     username: process.env.CLICKHOUSE_USER,
