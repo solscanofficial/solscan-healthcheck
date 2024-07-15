@@ -85,11 +85,15 @@ const checkActivitiesData = async (timeThreshold) => {
         listNode = listNode.split(",");
         for (let obj of config_clickhouse) {
             for (let node of listNode) {
+                // temporary ignore node 4
+                if (node === 'http://clickhouse-04:8123') {
+                    continue;
+                }
                 const client = createClient({
                     url: node,
                     username: process.env.CLICKHOUSE_USER,
                     password: process.env.CLICKHOUSE_PASSWD,
-                    request_timeout: 30000,
+                    request_timeout: 60000,
                     max_open_connections: 10
                 })
                 obj.query = obj.query.replace("{part_key}", part_key)
@@ -105,6 +109,7 @@ const checkActivitiesData = async (timeThreshold) => {
                 } catch (error) {
                     errors.push(`${PREFIX} Query to ${obj.name} table in clickhouse ${node} failed`);
                 }
+                await client.close()
                 if (res && res.length > 0) {
                     const data = res[0]['data']
                     const distance = today - new Date(Math.abs(data))
