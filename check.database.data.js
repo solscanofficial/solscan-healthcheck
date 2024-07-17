@@ -35,7 +35,7 @@ const checkActivitiesData = async (timeThreshold) => {
 
             name: 'fact_token_transfer_activities',
             query: `SELECT min(block_time_key) as data FROM solscan.fact_token_transfer_activities
-                WHERE part_key = {part_key}`,
+                WHERE part_key = {part_key}`
         },
         {
 
@@ -66,12 +66,14 @@ const checkActivitiesData = async (timeThreshold) => {
             name: 'fact_token_price_d',
             query: `SELECT max(updated_time) as data  FROM solscan.fact_token_price_d 
                 WHERE part_key = {part_key}`,
+            timeThreshold: 0.5 * 60 * 60
         },
         {
 
             name: 'fact_block_summary_detail',
             query: `SELECT max(updated_time) as data  FROM solscan.fact_block_summary_detail 
                 WHERE part_key = {part_key}`,
+            timeThreshold: 0.5 * 60 * 60
         }
     ]
 
@@ -109,6 +111,7 @@ const checkActivitiesData = async (timeThreshold) => {
                 if (res && res.length > 0) {
                     const data = res[0]['data']
                     const distance = today - new Date(Math.abs(data))
+                    timeThreshold = obj.timeThreshold ? obj.timeThreshold : timeThreshold
                     if (distance > timeThreshold) {
                         errors.push(`${PREFIX} No data in ${obj.name} table in clickhouse ${node} in ${millisToMinutesAndSeconds(distance)} minutes ago`);
                     } else {
@@ -132,7 +135,7 @@ const checkActivitiesData = async (timeThreshold) => {
 const CHECK_LIST = {
     activitiesData: {
         healthCheckFunction: checkActivitiesData,
-        timeThreshold: 1 * 60 * 60
+        timeThreshold: 5 * 60
     }
 }
 
