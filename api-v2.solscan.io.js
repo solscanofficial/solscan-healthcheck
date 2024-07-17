@@ -9,12 +9,13 @@ const {OK, ERROR} = require("./status");
 
 // const SAMPLE_ADDRESS = `2qzTURMGo9gVdwYyCbyiTrvyDCvLNDaRPkiWefdnmExb`;  // wallet
 const SAMPLE_STAKE_ACC = '9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM';
-const SAMPLE_ADDRESS = SAMPLE_STAKE_ACC;
+const SAMPLE_ADDRESS = "5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1"; // raydium authority v4
+const SAMPLE_BALANCE_CHANGE_ADDRESS = "ob2htHLoCu2P6tX7RrNVtiG1mYTas8NGJEVLaFEUngk";
 const SAMPLE_ACC_ADDR_TOKEN_ACC = 'FGETo8T8wMcN2wCjav8VK6eh3dLk63evNDPxzLSJra8B'; // USDC of 9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM
 const SAMPLE_ACC_ADDR_PROGRAM = 'LendZqTs7gn5CTSJU1jWKhKuVpjJGom45nnwPb2AMTi'; // Lending program
-const SAMPLE_TOKEN = `EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v`; // USDC
+const SAMPLE_TOKEN = `JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN`; // JUP
 const SAMPLE_OLD_TRANSACTION = '2cbw5sBvusbsmV2GKe9JLPivug2jvL6k1hWkxBhWYC5jUmpkyyFn673uM8xeMvrhpcbRTv53rkYkMaLafF6QYDBo';
-const SAMPLE_ADDRESS_FOR_AMM = '58oQChx4yWmvKdwLLZzBi4ChoCc2fqCUWBkwMihLYQo2';  // SOL-USDC pair
+const NFT_SAMPLE = '6kuKnYgCqnBS6R35j6qHrgxZz7BTMhHJ9zuwfSdy33VV';
 const RETRY = 3;
 
 const request = async (url) => {
@@ -51,12 +52,12 @@ const blockCheck = async (solscanEndpoint, timeThreshold) => {
         blockUrl = `${solscanEndpoint}/block/last?q=1`;
         const {data} = await getData(blockUrl);
         if (!data || !data.success || !data.data) {
-            errors.push(`[Solscan Block API] Failed to get the latest block (${blockUrl}). Response data is ${JSON.stringify(data)}`);
+            errors.push(`[Solscan Block API-V2] Failed to get the latest block (${blockUrl}). Response data is ${JSON.stringify(data)}`);
         } else {
-            console.log("[Solscan Block API] Get the latest block success.");
+            console.log("[Solscan Block API-V2] Get block latest success.");
         }
 
-        let latestBlock = data[0];
+        let latestBlock = data.data[0];
         let currentSlot;
 
         if (latestBlock) {
@@ -65,7 +66,7 @@ const blockCheck = async (solscanEndpoint, timeThreshold) => {
             // check time of the latest block
             let now = Date.now() / 1000;
             if (now - latestBlock.result.blockTime > timeThreshold) {
-                errors.push(`[Solscan Block API] No new block since ${formatDistance(
+                errors.push(`[Solscan Block API-V2] No new block since ${formatDistance(
                     latestBlock.result.blockTime * 1000,
                     new Date(),
                     {
@@ -79,16 +80,16 @@ const blockCheck = async (solscanEndpoint, timeThreshold) => {
 
         // check block detail
         if (currentSlot) {
-            blockUrl = `${solscanEndpoint}/block?block=${currentSlot}`;
+            blockUrl = `${solscanEndpoint}/block/detail?block=${currentSlot}`;
             const {data} = await getData(blockUrl);
             if (!data) {
-                errors.push(`[Solscan Block API] Failed to get info of block (${blockUrl}). Response data is ${JSON.stringify(data)}`);
+                errors.push(`[Solscan Block API-V2] Failed to get info of block (${blockUrl}). Response data is ${JSON.stringify(data)}`);
             } else {
-                console.log("[Solscan Block API] Get info of the latest block success.");
+                console.log("[Solscan Block API-V2] Get block detail success.");
             }
         }
     } catch (err) {
-        errors.push(`[Solscan Block API] API failed (${blockUrl}). Error: ${err}`);
+        errors.push(`[Solscan Block API-V2] API failed (${blockUrl}). Error: ${err}`);
     }
 
     if (errors.length > 0) {
@@ -111,14 +112,14 @@ const transactionCheck = async (solscanEndpoint, timeThreshold) => {
         txUrl = `${solscanEndpoint}/transaction/last?q=10`;
         const {data} = await getData(txUrl);
         if (!data || !data.success || !data.data) {
-            errors.push(`[Solscan Transaction API] Failed to get last transactions (${txUrl}). Response data is ${JSON.stringify(data)}`);
+            errors.push(`[Solscan Transaction API-V2] Failed to get last transactions (${txUrl}). Response data is ${JSON.stringify(data)}`);
         } else {
-            console.log("[Solscan Transaction API] Get last 20 transactions success.");
+            console.log("[Solscan Transaction API-V2] Get transaction last success.");
         }
 
         let latestTx;
         if (data) {
-            latestTx = data[19];
+            latestTx = data.data[0];
         }
 
         let latestTxHash;
@@ -127,7 +128,7 @@ const transactionCheck = async (solscanEndpoint, timeThreshold) => {
 
             let now = Date.now() / 1000;
             if (now - latestTx.blockTime > timeThreshold) {
-                errors.push(`[Solscan Transaction API] No new transaction since ${formatDistance(
+                errors.push(`[Solscan Transaction API-V2] No new transaction since ${formatDistance(
                     latestTx.blockTime * 1000,
                     new Date(),
                     {
@@ -139,23 +140,14 @@ const transactionCheck = async (solscanEndpoint, timeThreshold) => {
             }
         }
 
-        // check a random old transaction
-        txUrl = `${solscanEndpoint}/transaction?tx=${SAMPLE_OLD_TRANSACTION}`;
-        const {data: oldTxDetail} = await getData(txUrl);
-        if (!oldTxDetail || !oldTxDetail.success) {
-            errors.push(`[Solscan Transaction API] Failed to get detail of an old transaction (${txUrl}). TxDetail: ${JSON.stringify(oldTxDetail)}`);
-        } else {
-            console.log("[Solscan Transaction API] Get old transaction detail success.");
-        }
-
         // check transaction detail API
         if (latestTxHash) {
-            txUrl = `${solscanEndpoint}/transaction?tx=${latestTxHash}`;
+            txUrl = `${solscanEndpoint}/transaction/detail?tx=${latestTxHash}`;
             const {data: txDetail} = await getData(txUrl);
             if (!txDetail || !txDetail.success) {
-                errors.push(`[Solscan Transaction API] Failed to get detail of the latest transaction (${txUrl}). Response: ${JSON.stringify(txDetail)}`);
+                errors.push(`[Solscan Transaction API-V2] Failed to get detail of transaction (${txUrl}). Response: ${JSON.stringify(txDetail)}`);
             } else {
-                console.log("[Solscan Transaction API] Get the latest transaction detail success.");
+                console.log("[Solscan Transaction API-V2] Get transaction detail success.");
             }
 
             // check transaction overview
@@ -163,80 +155,22 @@ const transactionCheck = async (solscanEndpoint, timeThreshold) => {
             const {data: overview} = await getData(txUrl);
 
             if (!overview || !overview.success) {
-                errors.push(`[Solscan Transaction API] Failed to get overview of transaction (${txUrl}). Response data is ${JSON.stringify(overview)}`);
+                errors.push(`[Solscan Transaction API-V2] Failed to get overview of transaction (${txUrl}). Response data is ${JSON.stringify(overview)}`);
             } else {
-                console.log("[Solscan Transaction API] Get overview of latest transaction success.");
+                console.log("[Solscan Transaction API-V2] Get transaction overview success.");
             }
 
             // check transaction status
             txUrl = `${solscanEndpoint}/transaction/status?tx=${latestTxHash}`;
             const {data: status} = await getData(txUrl);
             if (!status || !status.success) {
-                errors.push(`[Solscan Transaction API] Failed to get status of transaction (${txUrl}). Response data is ${JSON.stringify(status)}`);
+                errors.push(`[Solscan Transaction API-V2] Failed to get status of transaction (${txUrl}). Response data is ${JSON.stringify(status)}`);
             } else {
-                console.log("[Solscan Transaction API] Get status of latest transaction success.");
+                console.log("[Solscan Transaction API-V2] Get transaction status success.");
             }
         }
     } catch (err) {
-        errors.push(`[Solscan Transaction API] API failed (${txUrl}). Error: ${err}`);
-    }
-
-    if (errors.length > 0) {
-        return {
-            status: ERROR,
-            errors: errors
-        }
-    }
-
-    return {
-        status: OK,
-    }
-}
-
-const splTransferCheck = async (solscanEndpoint, timeThreshold) => {
-    let errors = [];
-
-    try {
-        const {data} = await getData(
-            `${solscanEndpoint}/account/token/txs?address=${SAMPLE_ADDRESS}`
-        );
-
-        if (!data || !data.success) {
-            errors.push(`[Solscan Account API] Failed to get SplTransfer of account (${solscanEndpoint}/account/token/txs?address=${SAMPLE_ADDRESS}). Response data is ${JSON.stringify(data)}`);
-        } else {
-            console.log(`[Solscan Account API] Get SplTransfer of account ${SAMPLE_ADDRESS} success.`);
-        }
-    } catch (err) {
-        errors.push(`[Solscan Account API] Failed to get SplTransfer of account (${solscanEndpoint}/account/token/txs?address=${SAMPLE_ADDRESS}): ${err}`);
-    }
-
-    if (errors.length > 0) {
-        return {
-            status: ERROR,
-            errors: errors
-        }
-    }
-
-    return {
-        status: OK,
-    }
-}
-
-const solTransferCheck = async (solscanEndpoint, timeThreshold) => {
-    let errors = [];
-
-    try {
-        const {data} = await getData(
-            `${solscanEndpoint}/account/soltransfer/txs?address=${SAMPLE_ADDRESS}`
-        );
-
-        if (!data || !data.success) {
-            errors.push(`[Solscan Account API] Failed to get SolTransfer of account (${solscanEndpoint}/account/soltransfer/txs?address=${SAMPLE_ADDRESS}). Response data is ${JSON.stringify(data)}`);
-        } else {
-            console.log(`[Solscan Account API] Get SolTransfer of account ${SAMPLE_ADDRESS} success.`);
-        }
-    } catch (err) {
-        errors.push(`[Solscan Account API] Failed to get SolTransfer of account (${solscanEndpoint}/account/soltransfer/txs?address=${SAMPLE_ADDRESS}): ${err}`);
+        errors.push(`[Solscan Transaction API-V2] API failed (${txUrl}). Error: ${err}`);
     }
 
     if (errors.length > 0) {
@@ -255,123 +189,94 @@ const accountCheck = async (solscanEndpoint, timeThreshold) => {
     let errors = [];
 
     // check account info
-    let check_token = '';
+    const accountDetailEndpoint = `${solscanEndpoint}/account?address=${SAMPLE_ADDRESS}`;
     try {
         // wallet
-        check_token = SAMPLE_ADDRESS;
-        const {data: wallet} = await getData(
-            `${solscanEndpoint}/account?address=${SAMPLE_ADDRESS}`
-        );
-        if (!wallet || !wallet.success || !wallet.data) {
-            errors.push(`[Solscan Account API] Failed to get info of wallet account (${solscanEndpoint}/account?address=${SAMPLE_ADDRESS}). Response data is ${JSON.stringify(wallet)}`);
+        const {data: wallet} = await getData(accountDetailEndpoint);
+        if (wallet == null || wallet.success !== true || wallet.data == null) {
+            errors.push(`[Solscan Account API-V2] Failed to get info of account (${accountDetailEndpoint}). Response data is ${JSON.stringify(wallet)}`);
         } else {
-            console.log(`[Solscan Account API] Get info of sample wallet success.`);
-        }
-
-        // token
-        check_token = SAMPLE_TOKEN;
-        const {data: token} = await getData(
-            `${solscanEndpoint}/account?address=${SAMPLE_TOKEN}`
-        );
-        if (!token || !token.success || !token.data) {
-            errors.push(`[Solscan Account API] Failed to get info of token account (${solscanEndpoint}/account?address=${SAMPLE_TOKEN}). Response data is ${JSON.stringify(token)}`);
-        } else {
-            console.log(`[Solscan Account API] Get info of sample token success.`);
-        }
-
-        // token account
-        check_token = SAMPLE_ACC_ADDR_TOKEN_ACC;
-        const {data: token_acc} = await getData(
-            `${solscanEndpoint}/account?address=${SAMPLE_ACC_ADDR_TOKEN_ACC}`
-        );
-        if (!token_acc || !token_acc.success || !token_acc.data) {
-            errors.push(`[Solscan Account API] Failed to get info of account token (${solscanEndpoint}/account?address=${SAMPLE_ACC_ADDR_TOKEN_ACC}). Response data is ${JSON.stringify(token_acc)}`);
-        } else {
-            console.log(`[Solscan Account API] Get info of sample token account success.`);
-        }
-
-        // program
-        check_token = SAMPLE_ACC_ADDR_PROGRAM;
-        const {data: program} = await getData(
-            `${solscanEndpoint}/account?address=${SAMPLE_ACC_ADDR_PROGRAM}`
-        );
-        if (!program || !program.success || !program.data) {
-            errors.push(`[Solscan Account API] Failed to get info of program account (${solscanEndpoint}/account?address=${SAMPLE_ACC_ADDR_PROGRAM}). Response data is ${JSON.stringify(program)}`);
-        } else {
-            console.log(`[Solscan Account API] Get info of sample program success.`);
+            console.log(`[Solscan Account API-V2] Get account detail success.`);
         }
     } catch (err) {
-        errors.push(`[Solscan Account API] Failed to get info of account (${solscanEndpoint}/account?address=${SAMPLE_ACC_ADDR_PROGRAM}). Error: ${err}`);
+        errors.push(`[Solscan Account API-V2] Failed to get info of account (${accountDetailEndpoint}). Error: ${err}`);
     }
 
     // check account tokens
+    const accountTokensEndpoint = `${solscanEndpoint}/account/tokens?address=${SAMPLE_ADDRESS}`;
     try {
-        const {data: acc_tokens} = await getData(
-            `${solscanEndpoint}/account/tokens?address=${SAMPLE_ADDRESS}`
-        );
-        if (!acc_tokens || !acc_tokens.success) {
-            errors.push(`[Solscan Account API] Failed to get tokens of account (${solscanEndpoint}/account/tokens?address=${SAMPLE_ADDRESS}). Response: ${JSON.stringify(acc_tokens)}`);
+        const {data: acc_tokens} = await getData(accountTokensEndpoint);
+        if (acc_tokens == null || acc_tokens.success !== true) {
+            errors.push(`[Solscan Account API-V2] Failed to get tokens of account (${accountTokensEndpoint}). Response: ${JSON.stringify(acc_tokens)}`);
         } else {
-            console.log(`[Solscan Account API] Get tokens of sample account success.`);
+            console.log(`[Solscan Account API-V2] Get account tokens success.`);
         }
     } catch (err) {
-        errors.push(`[Solscan Account API] Failed to get tokens of account (${solscanEndpoint}/account/tokens?address=${SAMPLE_ADDRESS}). Error: ${err}`);
+        errors.push(`[Solscan Account API-V2] Failed to get tokens of account (${accountTokensEndpoint}). Error: ${err}`);
     }
 
-    // check account transaction
+    // check account transactions
+    const accountTxsEndpoint = `${solscanEndpoint}/account/transaction?address=${SAMPLE_ADDRESS}`;
     try {
-        const {data} = await getData(
-            `${solscanEndpoint}/account/transaction?address=${SAMPLE_ADDRESS}`
-        );
-        if (!data || !data.success) {
-            errors.push(`[Solscan Account API] Failed to get transactions of account (${solscanEndpoint}/account/transaction?address=${SAMPLE_ADDRESS}). Response: ${JSON.stringify(data)}`);
+        const {data} = await getData(accountTxsEndpoint);
+        if (data == null || data.success !== true) {
+            errors.push(`[Solscan Account API-V2] Failed to get transactions of account (${accountTxsEndpoint}). Response: ${JSON.stringify(data)}`);
         } else {
-            console.log(`[Solscan Account API] Get transaction of sample account success.`);
+            console.log(`[Solscan Account API-V2] Get account transaction success.`);
         }
     } catch (err) {
-        errors.push(`[Solscan Account API] Failed to get transactions of account (${solscanEndpoint}/account/transaction?address=${SAMPLE_ADDRESS}). Error: ${err}`);
+        errors.push(`[Solscan Account API-V2] Failed to get transactions of account (${accountTxsEndpoint}). Error: ${err}`);
     }
 
-    // check account stake
+    // check account balance changes
+    const accountBalanceChangeEndpoint = `${solscanEndpoint}/account/balance_change?address=${SAMPLE_BALANCE_CHANGE_ADDRESS}`;
     try {
-        const {data} = await getData(
-            `${solscanEndpoint}/account/stake?address=${SAMPLE_STAKE_ACC}`
-        );
-        if (!data || !data.success) {
-            errors.push(`[Solscan Account API] Failed to get stake of account (${solscanEndpoint}/account/stake?address=${SAMPLE_STAKE_ACC}). Response data is ${JSON.stringify(data)}`);
+        const {data} = await getData(accountBalanceChangeEndpoint);
+        if (data == null || data.success !== true || data.data == null) {
+            errors.push(`[Solscan Account API-V2] Failed to balance changes of account (${accountBalanceChangeEndpoint}). Response data is ${JSON.stringify(data)}`);
         } else {
-            console.log(`[Solscan Account API] Get stake of sample account success.`);
+            console.log(`[Solscan Account API-V2] Get account balance changes success.`);
+            // check if balance changes is catchup
+            let latestTxTime = data.data.transactions[0].block_time;
+            let distance = Date.now() / 1000 - latestTxTime;
+            if (distance > timeThreshold) {
+                errors.push(`[Solscan Account API-V2] No new balance changes since ${formatDistance(
+                    latestTxTime * 1000,
+                    new Date(),
+                    {
+                        addSuffix: true,
+                    }
+                )}`);
+            }
         }
     } catch (err) {
-        errors.push(`[Solscan Account API] Failed to get stake of account (${solscanEndpoint}/account/stake?address=${SAMPLE_STAKE_ACC}). Error: ${err}`);
+        errors.push(`[Solscan Account API-V2] Failed to get balance changes of account (${accountBalanceChangeEndpoint}). Error: ${err}`);
     }
 
-    // check account token txs
+    // check account transfers
+    const accountTransferEndpoint = `${solscanEndpoint}/account/transfer?address=${SAMPLE_ADDRESS}`;
     try {
-        const {data} = await getData(
-            `${solscanEndpoint}/account/token/txs?address=${SAMPLE_ADDRESS}&token_address=${SAMPLE_TOKEN}`
-        );
-        if (!data || !data.success) {
-            errors.push(`[Solscan Account API] Failed to get txs token of account (${solscanEndpoint}/account/token/txs?address=${SAMPLE_ADDRESS}&token_address=${SAMPLE_TOKEN}). Response data is ${JSON.stringify(data)}`);
+        const {data} = await getData(accountTransferEndpoint);
+        if (data == null || data.success !== true || data.data == null) {
+            errors.push(`[Solscan Account API-V2] Failed to get transfers of account (${accountTransferEndpoint}). Response data is ${JSON.stringify(data)}`);
         } else {
-            console.log(`[Solscan Account API] Get txs token of sample account success.`);
+            console.log(`[Solscan Account API-V2] Get account transfers success.`);
         }
     } catch (err) {
-        errors.push(`[Solscan Account API] Failed to get txs token of account (${solscanEndpoint}/account/token/txs?address=${SAMPLE_ADDRESS}&token_address=${SAMPLE_TOKEN}): ${err}`);
+        errors.push(`[Solscan Account API-V2] Failed to get transfers of account (${accountTransferEndpoint}). Error: ${err}`);
     }
 
-    // check account transaction token
+    // check account defi activities
+    const accountDefiActivitiesEndpoint = `${solscanEndpoint}/account/activity/dextrading?address=${SAMPLE_ADDRESS}`;
     try {
-        const {data} = await getData(
-            `${solscanEndpoint}/account/transaction/token?address=${SAMPLE_STAKE_ACC}`
-        );
-        if (!data || !data.success) {
-            errors.push(`[Solscan Account API] Failed to get token transactions of account (${solscanEndpoint}/account/transaction/token?address=${SAMPLE_STAKE_ACC}). Response data is ${JSON.stringify(data)}`);
+        const {data} = await getData(accountDefiActivitiesEndpoint);
+        if (data == null || data.success !== true || data.data == null) {
+            errors.push(`[Solscan Account API-V2] Failed to get defi activities of account (${accountDefiActivitiesEndpoint}). Response data is ${JSON.stringify(data)}`);
         } else {
-            console.log(`[Solscan Account API] Get token transactions of sample account success.`);
+            console.log(`[Solscan Account API-V2] Get account defi activities success.`);
         }
     } catch (err) {
-        errors.push(`[Solscan Account API] Failed to get token transactions of account (${solscanEndpoint}/account/transaction/token?address=${SAMPLE_STAKE_ACC}). Error: ${err}`);
+        errors.push(`[Solscan Account API-V2] Failed to get defi activities of account (${accountDefiActivitiesEndpoint}). Error: ${err}`);
     }
 
     if (errors.length > 0) {
@@ -389,89 +294,50 @@ const accountCheck = async (solscanEndpoint, timeThreshold) => {
 const tokenCheck = async (solscanEndpoint, timeThreshold) => {
     let errors = [];
 
-    // try {
-    //     // check list
-    //     const {data} = await getData(
-    //         `${solscanEndpoint}/tokens?offset=0&limit=5&sortby=market_cap&sorttype=desc`
-    //     );
-    //     if (
-    //         !data ||
-    //         !data.success ||
-    //         !data.data ||
-    //         !data.data.tokens ||
-    //         !data.data.tokens[0] ||
-    //         !data.data.tokens[0].mintAddress
-    //     ) {
-    //         errors.push(`[Solscan Token API] Failed to get TokenList (${solscanEndpoint}/tokens?offset=0&limit=5&sortby=market_cap&sorttype=desc). Response data is ${JSON.stringify(data)}`);
-    //     } else {
-    //         console.log(`[Solscan Token API] Get last 5 tokens success.`);
-    //     }
-    // } catch (err) {
-    //     errors.push(`[Solscan Token API] Failed to get TokenList (${solscanEndpoint}/tokens?offset=0&limit=5&sortby=market_cap&sorttype=desc). Error: ${err}`);
-    // }
-    //
-    // // check meta
-    // try {
-    //     const {data: meta} = await getData(
-    //         `${solscanEndpoint}/token/meta?token=${SAMPLE_TOKEN}`
-    //     );
-    //
-    //     if (!meta || !meta.success) {
-    //         errors.push(`[Solscan Token API] Failed to get meta of token (${solscanEndpoint}/token/meta?token=${SAMPLE_TOKEN}). Response data is ${JSON.stringify(meta)}`);
-    //     } else {
-    //         console.log(`[Solscan Token API] Get meta of token ${SAMPLE_TOKEN} success.`);
-    //     }
-    // } catch (err) {
-    //     errors.push(`[Solscan Token API] Failed to get meta of token (${solscanEndpoint}/token/meta?token=${SAMPLE_TOKEN}): ${err}`);
-    // }
-    //
-    // // check holders
-    // try {
-    //     const {data: holders} = await getData(
-    //         `${solscanEndpoint}/token/holders?offset=0&size=10&token=${SAMPLE_TOKEN}`
-    //     );
-    //
-    //     if (!holders || !holders.success) {
-    //         errors.push(`[Solscan Token API] Failed to get holders of token (${solscanEndpoint}/token/holders?offset=0&size=10&token=${SAMPLE_TOKEN}). Response data is ${JSON.stringify(holders)}`);
-    //     } else {
-    //         console.log(`[Solscan Token API] Get token holders success.`);
-    //     }
-    // } catch (err) {
-    //     errors.push(`[Solscan Token API] Failed to get holders of token (${solscanEndpoint}/token/holders?offset=0&size=10&token=${SAMPLE_TOKEN}): ${err}`);
-    // }
-    //
-    // // check holder statistic
-    // try {
-    //     const {data: holderStatistic} = await getData(
-    //         `${solscanEndpoint}/token/holder/statistic/total?tokenAddress=${SAMPLE_TOKEN}`
-    //     );
-    //
-    //     if (!holderStatistic || !holderStatistic.success) {
-    //         errors.push(`[Solscan Token API] Failed to get holder statistic of token (${solscanEndpoint}/token/holder/statistic/total?tokenAddress=${SAMPLE_TOKEN}). Response data is ${JSON.stringify(holderStatistic)}`);
-    //     } else {
-    //         console.log(`[Solscan Token API] Get holder statistic of token ${SAMPLE_TOKEN} success.`);
-    //     }
-    // } catch (err) {
-    //     errors.push(`[Solscan Token API] Failed to get holder statistic of token (${solscanEndpoint}/token/holder/statistic/total?tokenAddress=${SAMPLE_TOKEN}): ${err}`);
-    // }
-
-    // check transfers
+    // check token holders
+    const tokenHoldersEndpoint = `${solscanEndpoint}/token/holders?address=${SAMPLE_TOKEN}`;
     try {
-        const {data: transfers} = await getData(
-            `${solscanEndpoint}/token/transfer?address=${SAMPLE_TOKEN}&page=1&page_size=10&remove_spam=false&exclude_amount_zero=false`
-        );
+        const {data: holders} = await getData(tokenHoldersEndpoint);
+
+        if (!holders || !holders.success || !holders.data || !holders.data.items || !holders.data.items[0]) {
+            errors.push(`[Solscan Token API-V2] Failed to get holders of token (${tokenHoldersEndpoint}). Response data is ${JSON.stringify(holders)}`);
+        } else {
+            console.log(`[Solscan Token API-V2] Get token holders success.`);
+        }
+    } catch (err) {
+        errors.push(`[Solscan Token API-V2] Failed to get holders of token (${tokenHoldersEndpoint}). Error: ${err}`);
+    }
+
+    // check token trending
+    const tokenTrendingEndpoint = `${solscanEndpoint}/token/trending`;
+    try {
+        const {data: trending} = await getData(tokenTrendingEndpoint);
+
+        if (!trending || !trending.success || !trending.data || !trending.data[0]) {
+            errors.push(`[Solscan Token API-V2] Failed to get token trending (${tokenTrendingEndpoint}). Response data is ${JSON.stringify(trending)}`);
+        } else {
+            console.log(`[Solscan Token API-V2] Get token trending success.`);
+        }
+    } catch (err) {
+        errors.push(`[Solscan Token API-V2] Failed to get token trending (${tokenTrendingEndpoint}). Error: ${err}`);
+    }
+
+    // check token transfers
+    const tokenTransferEndpoint = `${solscanEndpoint}/token/transfer?address=${SAMPLE_TOKEN}&page=1&page_size=10&remove_spam=false&exclude_amount_zero=false`;
+    try {
+        const {data: transfers} = await getData(tokenTransferEndpoint);
 
         if (!transfers || !transfers.success || !transfers.data || !transfers.data[0]) {
-            errors.push(`[Solscan Token API V2] Failed to get transfers of token (${solscanEndpoint}/token/transfer?address=${SAMPLE_TOKEN}&page=1&page_size=10&remove_spam=false&exclude_amount_zero=false). Response data is ${JSON.stringify(transfers)}`);
+            errors.push(`[Solscan Token API-V2] Failed to get transfers of token (${tokenTransferEndpoint}). Response data is ${JSON.stringify(transfers)}`);
         } else {
-            console.log(`[Solscan Token API V2] Get transfers of token ${SAMPLE_TOKEN} success.`);
+            console.log(`[Solscan Token API-V2] Get token transfers success.`);
 
             // check time
             let transfer = transfers.data[0];
             let blockTime = transfer.block_time;
             let distance = Date.now() / 1000 - blockTime;
             if (distance > timeThreshold) {
-                errors.push(`[Solscan Token API V2] No new transfers since ${formatDistance(
+                errors.push(`[Solscan Token API-V2] No new token transfers since ${formatDistance(
                     blockTime * 1000,
                     new Date(),
                     {
@@ -481,26 +347,27 @@ const tokenCheck = async (solscanEndpoint, timeThreshold) => {
             }
         }
     } catch (err) {
-        errors.push(`[Solscan Token API V2] Failed to get transfers of token (${solscanEndpoint}/token/transfer?address=${SAMPLE_TOKEN}&page=1&page_size=10&remove_spam=false&exclude_amount_zero=false): ${err}`);
+        errors.push(`[Solscan Token API-V2] Failed to get transfers of token (${tokenTransferEndpoint}). Error: ${err}`);
     }
 
-    // check activities
+    // check token activities
+    const tokenDefiActivitiesEndpoint = `${solscanEndpoint}/token/activity/dextrading?address=${SAMPLE_TOKEN}&page=1&page_size=10`;
     try {
         const {data: activities} = await getData(
-            `${solscanEndpoint}/token/activity/dextrading?address=${SAMPLE_TOKEN}&page=1&page_size=10`
+            tokenDefiActivitiesEndpoint
         );
 
         if (!activities || !activities.success || !activities.data || !activities.data[0]) {
-            errors.push(`[Solscan Token API V2] Failed to get activities of token (${solscanEndpoint}/token/activity/dextrading?address=${SAMPLE_TOKEN}&page=1&page_size=10). Response data is ${JSON.stringify(activities)}`);
+            errors.push(`[Solscan Token API-V2] Failed to get activities of token (${tokenDefiActivitiesEndpoint}). Response data is ${JSON.stringify(activities)}`);
         } else {
-            console.log(`[Solscan Token API V2] Get activities of token ${SAMPLE_TOKEN} success.`);
+            console.log(`[Solscan Token API-V2] Get token defi activities success.`);
 
             // check time
             let transfer = activities.data[0];
             let blockTime = transfer.block_time;
             let distance = Date.now() / 1000 - blockTime;
             if (distance > timeThreshold) {
-                errors.push(`[Solscan Token API V2] No new activities since ${formatDistance(
+                errors.push(`[Solscan Token API-V2] No new token defi activities since ${formatDistance(
                     blockTime * 1000,
                     new Date(),
                     {
@@ -510,7 +377,7 @@ const tokenCheck = async (solscanEndpoint, timeThreshold) => {
             }
         }
     } catch (err) {
-        errors.push(`[Solscan Token API V2] Failed to get activities of token (${solscanEndpoint}/token/activity/dextrading?address=${SAMPLE_TOKEN}&page=1&page_size=10): ${err}`);
+        errors.push(`[Solscan Token API-V2] Failed to get activities of token (${tokenDefiActivitiesEndpoint}). Error: ${err}`);
     }
 
     if (errors.length > 0) {
@@ -528,71 +395,31 @@ const tokenCheck = async (solscanEndpoint, timeThreshold) => {
 const defiCheck = async (solscanEndpoint, timeThreshold) => {
     let errors = [];
 
-    // check all
+    // check amm overview
+    const ammOverviewEndpoint = `${solscanEndpoint}/defi/amm/overview?time_range=7`;
     try {
-        const {data} = await getData(`${solscanEndpoint}/amm/all`);
-        if (!data || !data.data || !data.data[0] || !data.data[0].address) {
-            errors.push(`[Solscan AMM API] Failed to get all AMMs (${solscanEndpoint}/amm/all). Response data ${JSON.stringify(data)}`);
+        const {data} = await getData(ammOverviewEndpoint);
+        if (!data || !data.success || !data.data) {
+            errors.push(`[Solscan AMM API-V2] Failed to get amm overview (${ammOverviewEndpoint}). Response data ${JSON.stringify(data)}`);
         } else {
-            console.log(`[Solscan AMM API] Get all AMMs success.`);
+            console.log(`[Solscan AMM API-V2] Get amm overview success`);
         }
     } catch (err) {
-        errors.push(`[Solscan AMM API] Failed to get all AMMs (${solscanEndpoint}/amm/all). Error: ${err}`);
+        errors.push(`[Solscan AMM API-V2] Failed to get amm overview (${ammOverviewEndpoint}). Error: ${err}`);
     }
 
-    // check reads
+    // check amm overview
+    const ammListEndpoint = `${solscanEndpoint}/defi/amm/list`;
     try {
-        const {data} = await getData(
-            `${solscanEndpoint}/amm/reads?source=raydium&offset=0&limit=1`
-        );
-        if (
-            !data ||
-            !data.data ||
-            !data.data.items ||
-            !data.data.items[0] ||
-            !data.data.items[0].address
-        ) {
-            errors.push(`[Solscan AMM API] Failed to get AMM detail (${solscanEndpoint}/amm/reads?source=raydium&keyword=sol&offset=0&limit=1). Response data ${JSON.stringify(data)}`);
+        const {data} = await getData(ammListEndpoint);
+        if (!data || !data.success || !data.data) {
+            errors.push(`[Solscan AMM API-V2] Failed to get amm list (${ammListEndpoint}). Response data ${JSON.stringify(data)}`);
         } else {
-            console.log(`[Solscan AMM API] Get AMM detail success.`);
+            console.log(`[Solscan AMM API-V2] Get amm list success`);
         }
     } catch (err) {
-        errors.push(`[Solscan AMM API] Failed to get AMM (${solscanEndpoint}/amm/reads?source=raydium&keyword=sol&offset=0&limit=1). Error: ${err}`);
+        errors.push(`[Solscan AMM API-V2] Failed to get amm list (${ammOverviewEndpoint}). Error: ${err}`);
     }
-
-    // check pairs
-    // try {
-    //     const {data} = await getData(
-    //         `${solscanEndpoint}/amm/pairs?source=raydium`
-    //     );
-    //     if (
-    //         !data ||
-    //         !data.data ||
-    //         !data.data.items ||
-    //         !data.data.items[0] ||
-    //         !data.data.items[0].address
-    //     ) {
-    //         errors.push(`[Solscan AMM API] Failed to get pairs of raydium (${solscanEndpoint}/amm/pairs?source=raydium). Response data ${JSON.stringify(data)}`);
-    //     } else {
-    //         console.log(`[Solscan AMM API] Get pairs of raydium success.`);
-    //     }
-    // } catch (err) {
-    //     errors.push(`[Solscan AMM API] Failed to get pairs of raydium (${solscanEndpoint}/amm/pairs?source=raydium). Error: ${err}`);
-    // }
-
-    // check read
-    // try {
-    //     const {data} = await getData(
-    //         `${solscanEndpoint}/amm/read?address=${SAMPLE_ADDRESS_FOR_AMM}`
-    //     );
-    //     if (!data || !data.data || !data.data.address) {
-    //         errors.push(`[Solscan AMM API] Failed to get detail of pair (${solscanEndpoint}/amm/read?address=${SAMPLE_ADDRESS_FOR_AMM}). Response data ${JSON.stringify(data)}`);
-    //     } else {
-    //         console.log(`[Solscan AMM API] Get detail of sample pair success.`);
-    //     }
-    // } catch (err) {
-    //     errors.push(`[Solscan AMM API] Failed to get detail of pair (${solscanEndpoint}/amm/read?address=${SAMPLE_ADDRESS_FOR_AMM}). Error: ${err}`);
-    // }
 
     if (errors.length > 0) {
         return {
@@ -609,88 +436,43 @@ const defiCheck = async (solscanEndpoint, timeThreshold) => {
 const nftCheck = async (solscanEndpoint, timeThreshold) => {
     let errors = [];
 
-    let latestTrade;
-    let newNFT;
-
-    // check nft trade
+    // check nft collection overview
+    const nftOverviewEndpoint = `${solscanEndpoint}/nftcollection/overview_all`
     try {
-        const {data} = await getData(
-            `${solscanEndpoint}/nft/market/trade?offset=0&limit=1`
-        );
-        if (!data || !data.success) {
-            errors.push(`[Solscan NFT API] Failed to get NFT trades (${solscanEndpoint}/nft/market/trade?offset=0&limit=1). Response data ${JSON.stringify(data)}`);
+        const {data} = await getData(nftOverviewEndpoint);
+        if (!data || !data.data || !data.success) {
+            errors.push(`[Solscan NFT API-V2] Failed to get nft collection overview (${nftOverviewEndpoint}). Response data is ${JSON.stringify(data)}`);
         } else {
-            console.log(`[Solscan NFT API] Get NFT trades success.`);
+            console.log(`[Solscan NFT API-V2] Get nft collection overview success.`);
         }
     } catch (err) {
-        errors.push(`[Solscan NFT API] Failed to get NFT trades (${solscanEndpoint}/nft/market/trade?offset=0&limit=1). Error: ${err}`);
-    }
-
-    // if (latestTrade) {
-    //     let now = Date.now() / 1000;
-    //     if (now - latestTrade.tradeTime > timeThreshold) {
-    //         errors.push(`[Solscan NFT API] No NFT trades since ${formatDistance(
-    //             latestTrade.tradeTime * 1000,
-    //             new Date(),
-    //             {
-    //                 addSuffix: true,
-    //             }
-    //         )} (${new Date(latestTrade.tradeTime * 1000).toLocaleTimeString(
-    //             "en-US"
-    //         )})`);
-    //     }
-    // }
-
-    // check nft collections
-    try {
-        const {data} = await getData(
-            `${solscanEndpoint}/collection?sortBy=volume`
-        );
-        if (!data || !data.success) {
-            errors.push(`[Solscan NFT API] Failed to get NFT collections (${solscanEndpoint}/collection?sortBy=volume). Data: ${JSON.stringify(data)}`);
-        } else {
-            console.log(`[Solscan NFT API] Get NFT collections success.`);
-        }
-
-    } catch (err) {
-        errors.push(`[Solscan NFT API] Failed to get NFT collections (${solscanEndpoint}/collection?sortBy=volume). Error: ${err}`);
+        errors.push(`[Solscan NFT API-V2] Failed to get nft collection overview (${nftOverviewEndpoint}). Error: ${err}`);
     }
 
     // check new nft
+    const newNftEndpoint = `${solscanEndpoint}/nft/newnft`;
     try {
-        const {data} = await getData(
-            `${solscanEndpoint}/nft?sortBy=createdTime`
-        );
-        if (
-            !data ||
-            !data.data ||
-            !data.success ||
-            !data.data[0] ||
-            !data.data[0].info
-        ) {
-            errors.push(`[Solscan NFT API] Failed to get new NFTs (${solscanEndpoint}/nft?sortBy=createdTime). Response data is ${JSON.stringify(data)}`);
+        const {data} = await getData(newNftEndpoint);
+        if (!data || !data.data || !data.success) {
+            errors.push(`[Solscan NFT API-V2] Failed to get new NFTs (${newNftEndpoint}). Response data is ${JSON.stringify(data)}`);
         } else {
-            console.log(`[Solscan NFT API] Get new NFTs success.`);
+            console.log(`[Solscan NFT API-V2] Get nft new success.`);
         }
     } catch (err) {
-        errors.push(`[Solscan NFT API] Failed to get new NFTs (${solscanEndpoint}/nft?sortBy=createdTime). Error: ${err}`);
+        errors.push(`[Solscan NFT API-V2] Failed to get new NFTs (${newNftEndpoint}). Error: ${err}`);
     }
 
-    // check all nfts
+    // check nft detail
+    const nftDetailEndpoint = `${solscanEndpoint}/nft/detail?address=${NFT_SAMPLE}`;
     try {
-        const {data} = await getData(
-            `${solscanEndpoint}/nft?sortBy=tradeTime`
-        );
-        if (
-            !data ||
-            !data.success
-        ) {
-            errors.push(`[Solscan NFT API] Failed to get all NFTs (${solscanEndpoint}/nft?sortBy=tradeTime). Response data is ${JSON.stringify(data)}`);
+        const {data} = await getData(nftDetailEndpoint);
+        if (!data || !data.success || !data.data) {
+            errors.push(`[Solscan NFT API-V2] Failed to get nft detail (${nftDetailEndpoint}). Response data is ${JSON.stringify(data)}`);
         } else {
-            console.log(`[Solscan NFT API] Get all NFTs success.`);
+            console.log(`[Solscan NFT API-V2] Get nft detail success.`);
         }
     } catch (err) {
-        errors.push(`[Solscan NFT API] Failed to get all NFTs (${solscanEndpoint}/nft?sortBy=tradeTime). Error: ${err}`);
+        errors.push(`[Solscan NFT API-V2] Failed to get nft detail (${nftDetailEndpoint}). Error: ${err}`);
     }
 
     if (errors.length > 0) {
@@ -714,12 +496,12 @@ const validatorCheck = async (solscanEndpoint, timeThreshold) => {
             `${solscanEndpoint}/validator/list?offset=0&limit=20`
         );
         if (!data || !data.data || !data.data.items || !data.data.items[0]) {
-            errors.push(`[Solscan Validator API] Failed to get list validators (${solscanEndpoint}/validator/list?offset=0&limit=20). Response data ${JSON.stringify(data)}`);
+            errors.push(`[Solscan Validator API-V2] Failed to get list validators (${solscanEndpoint}/validator/list?offset=0&limit=20). Response data ${JSON.stringify(data)}`);
         } else {
-            console.log(`[Solscan Validator API] Get list validators success.`);
+            console.log(`[Solscan Validator API-V2] Get list validators success.`);
         }
     } catch (err) {
-        errors.push(`[Solscan Validator API] Failed to get list validators (${solscanEndpoint}/validator/list?offset=0&limit=20). Error: ${err}`);
+        errors.push(`[Solscan Validator API-V2] Failed to get list validators (${solscanEndpoint}/validator/list?offset=0&limit=20). Error: ${err}`);
     }
 
     // check version
@@ -728,12 +510,12 @@ const validatorCheck = async (solscanEndpoint, timeThreshold) => {
             `${solscanEndpoint}/validator/version`
         );
         if (!data || !data.data || !data.data || !data.data.items || !data.data.items[0]) {
-            errors.push(`[Solscan Validator API] Failed to get validator version (${solscanEndpoint}/validator/version). Response data ${JSON.stringify(data)}`);
+            errors.push(`[Solscan Validator API-V2] Failed to get validator version (${solscanEndpoint}/validator/version). Response data ${JSON.stringify(data)}`);
         } else {
-            console.log(`[Solscan Validator API] Get validator version success.`);
+            console.log(`[Solscan Validator API-V2] Get validator version success.`);
         }
     } catch (err) {
-        errors.push(`[Solscan Validator API] Failed to get validator version (${solscanEndpoint}/validator/version). Error: ${err}`);
+        errors.push(`[Solscan Validator API-V2] Failed to get validator version (${solscanEndpoint}/validator/version). Error: ${err}`);
     }
 
     // check leader schedule
@@ -742,12 +524,12 @@ const validatorCheck = async (solscanEndpoint, timeThreshold) => {
             `${solscanEndpoint}/validator/leader_schedule?offset=0&limit=10`
         );
         if (!data || !data.data || !data.data || !data.data.items || !data.data.items[0]) {
-            errors.push(`[Solscan Validator API] Failed to get leader schedule (${solscanEndpoint}/validator/leader_schedule?offset=0&limit=10). Response data ${JSON.stringify(data)}`);
+            errors.push(`[Solscan Validator API-V2] Failed to get leader schedule (${solscanEndpoint}/validator/leader_schedule?offset=0&limit=10). Response data ${JSON.stringify(data)}`);
         } else {
-            console.log(`[Solscan Validator API] Get leader schedule success.`);
+            console.log(`[Solscan Validator API-V2] Get leader schedule success.`);
         }
     } catch (err) {
-        errors.push(`[Solscan Validator API] Failed to get leader schedule (${solscanEndpoint}/validator/leader_schedule?offset=0&limit=10). Error: ${err}`);
+        errors.push(`[Solscan Validator API-V2] Failed to get leader schedule (${solscanEndpoint}/validator/leader_schedule?offset=0&limit=10). Error: ${err}`);
     }
 
     if (errors.length > 0) {
@@ -763,38 +545,28 @@ const validatorCheck = async (solscanEndpoint, timeThreshold) => {
 }
 
 const CHECK_LIST = {
-    // block: {
-    //     healthCheckFunction: blockCheck,
-    //     timeThreshold: 5 * 60
-    // },
-    // transaction: {
-    //     healthCheckFunction: transactionCheck,
-    //     timeThreshold: 5 * 60
-    // },
-    // solTransfer: {
-    //     healthCheckFunction: solTransferCheck,
-    // },
-    // splTransfer: {
-    //     healthCheckFunction: splTransferCheck,
-    // },
-    // account: {
-    //     healthCheckFunction: accountCheck,
-    //     timeThreshold: 5 * 60
-    // },
+    account: {
+        healthCheckFunction: accountCheck,
+        timeThreshold: 5 * 60
+    },
     token: {
         healthCheckFunction: tokenCheck,
-        timeThreshold: 3 * 60
+        timeThreshold: 5 * 60
     },
-    // defi: {
-    //     healthCheckFunction: defiCheck,
-    // },
-    // nftCheck: {
-    //     healthCheckFunction: nftCheck,
-    //     timeThreshold: 2 * 60 * 60
-    // },
-    // validatorCheck: {
-    //     healthCheckFunction: validatorCheck,
-    // }
+    block: {
+        healthCheckFunction: blockCheck,
+        timeThreshold: 5 * 60
+    },
+    transaction: {
+        healthCheckFunction: transactionCheck,
+        timeThreshold: 5 * 60
+    },
+    defi: {
+        healthCheckFunction: defiCheck
+    },
+    nft: {
+        healthCheckFunction: nftCheck
+    }
 }
 
 const checkAPIV2 = async (

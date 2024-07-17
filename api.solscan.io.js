@@ -14,7 +14,6 @@ const SAMPLE_ACC_ADDR_TOKEN_ACC = 'FGETo8T8wMcN2wCjav8VK6eh3dLk63evNDPxzLSJra8B'
 const SAMPLE_ACC_ADDR_PROGRAM = 'LendZqTs7gn5CTSJU1jWKhKuVpjJGom45nnwPb2AMTi'; // Lending program
 const SAMPLE_TOKEN = `EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v`; // USDC
 const SAMPLE_OLD_TRANSACTION = '2cbw5sBvusbsmV2GKe9JLPivug2jvL6k1hWkxBhWYC5jUmpkyyFn673uM8xeMvrhpcbRTv53rkYkMaLafF6QYDBo';
-const SAMPLE_ADDRESS_FOR_AMM = '58oQChx4yWmvKdwLLZzBi4ChoCc2fqCUWBkwMihLYQo2';  // SOL-USDC pair
 const RETRY = 3;
 
 const request = async (url) => {
@@ -734,36 +733,8 @@ const validatorCheck = async (solscanEndpoint, timeThreshold) => {
 };
 
 const CHECK_LIST = {
-    block: {
-        healthCheckFunction: blockCheck,
-        timeThreshold: 5 * 60, // if no new block in 300 seconds (5min), alert
-    },
-    transaction: {
-        healthCheckFunction: transactionCheck,
-        timeThreshold: 5 * 60,
-    },
-    solTransfer: {
-        healthCheckFunction: solTransferCheck,
-    },
     splTransfer: {
         healthCheckFunction: splTransferCheck,
-    },
-    account: {
-        healthCheckFunction: accountCheck,
-    },
-    token: {
-        healthCheckFunction: tokenCheck,
-        timeThreshold: 5 * 60,
-    },
-    defi: {
-        healthCheckFunction: defiCheck,
-    },
-    nftCheck: {
-        healthCheckFunction: nftCheck,
-        timeThreshold: 2 * 60 * 60,
-    },
-    validatorCheck: {
-        healthCheckFunction: validatorCheck,
     }
 };
 

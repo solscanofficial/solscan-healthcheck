@@ -63,7 +63,7 @@ const main = async () => {
 
     let start = Date.now();
 
-    // check disk if rabbitmq
+    // check disk rabbitmq
     if (process.env.IS_CHECK_RABBITMQ_DISK === "true") {
         try {
             const {data} = await axios.get(process.env.CHECK_RABBITMQ_DISK_API);
@@ -84,7 +84,7 @@ const main = async () => {
         }
     }
 
-    // check health
+    // check solana node
     if (process.env.IS_CHECK_NODE === 'true') {
         let listNode = process.env.NODE_RPC_ENDPOINT;
         if (listNode) {
@@ -98,6 +98,7 @@ const main = async () => {
         }
     }
 
+    // check clickhouse node health
     if (process.env.IS_CHECK_CLICKHOUSE === "true") {
         let listNode = process.env.CLICKHOUSE_NODES;
         if (listNode) {
@@ -111,6 +112,16 @@ const main = async () => {
         }
     }
 
+    // check clickhouse data
+    let clickhouseData = await checkClickhouseData()
+    if (clickhouseData && clickhouseData.length) {
+        for (const e of clickhouseData) {
+            if (e.status === ERROR) {
+                errors.push(...e.errors)
+            }
+        }
+    }
+
     // API v2
     if (process.env.IS_CHECK_SOLSCAN_API_V2 === "true") {
         let dataV2 = await checkAPIV2(process.env.SOLSCAN_ENDPOINT_V2)
@@ -119,16 +130,6 @@ const main = async () => {
                 if (e.status === ERROR) {
                     errors.push(...e.errors)
                 }
-            }
-        }
-    }
-
-    // API
-    let data = await checkAPI(process.env.SOLSCAN_ENDPOINT)
-    if (data && data.length) {
-        for (const e of data) {
-            if (e.status === ERROR) {
-                errors.push(...e.errors)
             }
         }
     }
@@ -157,15 +158,7 @@ const main = async () => {
         }
     }
 
-    // clickhouse data
-    let clickhouseData = await checkClickhouseData()
-    if (clickhouseData && clickhouseData.length) {
-        for (const e of clickhouseData) {
-            if (e.status === ERROR) {
-                errors.push(...e.errors)
-            }
-        }
-    }
+    // TODO: PRO API V2
 
     let region = process.env.REGION;
     if (region) {
