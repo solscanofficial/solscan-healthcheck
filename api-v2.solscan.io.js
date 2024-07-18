@@ -51,7 +51,7 @@ const blockCheck = async (solscanEndpoint, timeThreshold) => {
         // check list
         blockUrl = `${solscanEndpoint}/block/last?q=1`;
         const {data} = await getData(blockUrl);
-        if (!data || !data.success || !data.data) {
+        if (!data || !data.success || !data.data || !data.data[0]) {
             errors.push(`[Solscan Block API-V2] Failed to get the latest block (${blockUrl}). Response data is ${JSON.stringify(data)}`);
         } else {
             console.log("[Solscan Block API-V2] Get block latest success.");
@@ -62,19 +62,23 @@ const blockCheck = async (solscanEndpoint, timeThreshold) => {
 
         if (latestBlock) {
             currentSlot = latestBlock.currentSlot;
-
-            // check time of the latest block
-            let now = Date.now() / 1000;
-            if (now - latestBlock.result.blockTime > timeThreshold) {
-                errors.push(`[Solscan Block API-V2] No new block since ${formatDistance(
-                    latestBlock.result.blockTime * 1000,
-                    new Date(),
-                    {
-                        addSuffix: true,
-                    }
-                )} (${new Date(latestBlock.result.blockTime * 1000).toLocaleTimeString(
-                    "en-US"
-                )}). LatestBlock: ${latestBlock.result.blockHeight}`);
+            let result = latestBlock.result;
+            if (result == null) {
+                errors.push(`[Solscan Block API-V2] Failed to get the latest block (${blockUrl}). Response data is ${JSON.stringify(data)}`);
+            } else {
+                // check time of the latest block
+                let now = Date.now() / 1000;
+                if (now - result.blockTime > timeThreshold) {
+                    errors.push(`[Solscan Block API-V2] No new block since ${formatDistance(
+                        result.blockTime * 1000,
+                        new Date(),
+                        {
+                            addSuffix: true,
+                        }
+                    )} (${new Date(result.blockTime * 1000).toLocaleTimeString(
+                        "en-US"
+                    )}). LatestBlock: ${result.blockHeight}`);
+                }
             }
         }
 
