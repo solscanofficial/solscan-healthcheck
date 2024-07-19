@@ -236,12 +236,12 @@ const accountCheck = async (solscanEndpoint, timeThreshold) => {
     const accountBalanceChangeEndpoint = `${solscanEndpoint}/account/balance_change?address=${SAMPLE_BALANCE_CHANGE_ADDRESS}`;
     try {
         const {data} = await getData(accountBalanceChangeEndpoint);
-        if (data == null || data.success !== true || data.data == null) {
+        if (data == null || data.success !== true || data.data == null || data.data[0] == null) {
             errors.push(`[Solscan Account API-V2] Failed to balance changes of account (${accountBalanceChangeEndpoint}). Response data is ${JSON.stringify(data)}`);
         } else {
             console.log(`[Solscan Account API-V2] Get account balance changes success.`);
             // check if balance changes is catchup
-            let latestTxTime = data.data.transactions[0].block_time;
+            let latestTxTime = data.data[0].block_time;
             let distance = Date.now() / 1000 - latestTxTime;
             if (distance > timeThreshold) {
                 errors.push(`[Solscan Account API-V2] No new balance changes since ${formatDistance(
