@@ -4,7 +4,7 @@ const {OK, ERROR} = require("./status");
 
 
 const SAMPLE_ADDRESS = `9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM`;
-const SAMPLE_TOKEN = `SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt`;
+const SAMPLE_TOKEN = `JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN`; // JUP
 const SAMPLE_NFT = "DfM8FTGLU5YTZ7duyqJtb568yQL5w9XtBUtHSUX6zt6W";
 const SAMPLE_NFT_WALLET = "3vzSskynfMnNAVZm2on7ouazxoJLMc1DMEW4ttseTBcs";
 const SAMPLE_NFT_COLLECTION_ID = "229f30fb8b5f0a7ff7fea1acd51bd102be43fe02e8d1c24f36331b41dae0d167";
