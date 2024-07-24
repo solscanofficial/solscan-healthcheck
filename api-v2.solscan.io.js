@@ -130,18 +130,18 @@ const transactionCheck = async (solscanEndpoint, timeThreshold) => {
         if (latestTx) {
             latestTxHash = latestTx.txHash;
 
-            let now = Date.now() / 1000;
-            if (now - latestTx.blockTime > timeThreshold) {
-                errors.push(`[Solscan Transaction API-V2] No new transaction since ${formatDistance(
-                    latestTx.blockTime * 1000,
-                    new Date(),
-                    {
-                        addSuffix: true,
-                    }
-                )} (${new Date(latestTx.blockTime * 1000).toLocaleTimeString(
-                    "en-US"
-                )})`);
-            }
+            // let now = Date.now() / 1000;
+            // if (now - latestTx.blockTime > timeThreshold) {
+            //     errors.push(`[Solscan Transaction API-V2] No new transaction since ${formatDistance(
+            //         latestTx.blockTime * 1000,
+            //         new Date(),
+            //         {
+            //             addSuffix: true,
+            //         }
+            //     )} (${new Date(latestTx.blockTime * 1000).toLocaleTimeString(
+            //         "en-US"
+            //     )})`);
+            // }
         }
 
         // check transaction detail API
