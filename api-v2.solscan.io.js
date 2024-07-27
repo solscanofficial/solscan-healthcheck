@@ -77,7 +77,7 @@ const blockCheck = async (solscanEndpoint, timeThreshold) => {
                         }
                     )} (${new Date(result.blockTime * 1000).toLocaleTimeString(
                         "en-US"
-                    )}). LatestBlock: ${result.blockHeight}`);
+                    )}). LatestBlock: ${currentSlot}`);
                 }
             }
         }
