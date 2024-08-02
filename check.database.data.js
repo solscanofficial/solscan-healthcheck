@@ -1,5 +1,5 @@
-const {createClient} = require('@clickhouse/client');
-const {OK, ERROR} = require("./status");
+const { createClient } = require('@clickhouse/client');
+const { OK, ERROR } = require("./status");
 const path = require('path')
 require('dotenv').config({
     path: path.resolve(__dirname, './.env')
@@ -11,7 +11,7 @@ function millisToMinutesAndSeconds(millis) {
     return Math.floor(millis / 60)
 }
 
-function getCurrentpartKey() {
+function getCurrentPartKey() {
     let d = new Date(),
         month = '' + (d.getMonth() + 1),
         day = '' + d.getDate(),
@@ -78,19 +78,21 @@ const checkActivitiesData = async (timeThreshold) => {
 
     const today = new Date().getTime() / 1000
 
-    const part_key = getCurrentpartKey()
+    const part_key = getCurrentPartKey()
 
     if (listNode) {
         listNode = listNode.split(",");
+
         for (let node of listNode) {
+            const client = createClient({
+                url: node,
+                username: process.env.CLICKHOUSE_USER,
+                password: process.env.CLICKHOUSE_PASSWD,
+                request_timeout: 60000,
+                max_open_connections: 10
+            })
+
             for (let obj of config_clickhouse) {
-                const client = createClient({
-                    url: node,
-                    username: process.env.CLICKHOUSE_USER,
-                    password: process.env.CLICKHOUSE_PASSWD,
-                    request_timeout: 60000,
-                    max_open_connections: 10
-                })
                 obj.query = obj.query.replace("{part_key}", part_key)
 
                 let res = []
@@ -104,7 +106,7 @@ const checkActivitiesData = async (timeThreshold) => {
                 } catch (error) {
                     errors.push(`${PREFIX}[${node}] Query to ${obj.name} table failed`);
                 }
-                await client.close()
+
                 if (res && res.length > 0) {
                     const data = res[0]['data']
                     const distance = today - new Date(Math.abs(data))
@@ -116,6 +118,9 @@ const checkActivitiesData = async (timeThreshold) => {
                     }
                 }
             }
+
+            // close client
+            await client.close();
         }
     }
     if (errors.length > 0) {
