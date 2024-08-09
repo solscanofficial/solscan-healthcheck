@@ -303,7 +303,7 @@ const tokenCheck = async (solscanEndpoint, timeThreshold) => {
     try {
         const {data: holders} = await getData(tokenHoldersEndpoint);
 
-        if (!holders || !holders.success || !holders.data || !holders.data.items || !holders.data.items[0]) {
+        if (!holders || !holders.success || !holders.data || !holders.data[0]) {
             errors.push(`[Solscan Token API-V2] Failed to get holders of token (${tokenHoldersEndpoint}). Response data is ${JSON.stringify(holders)}`);
         } else {
             console.log(`[Solscan Token API-V2] Get token holders success.`);
